@@ -119,7 +119,7 @@ section[data-testid="stFileUploader"] * {
 
 /* Caja resultado */
 .result-box {
-    background-color: rgba(139, 43, 43, 0.9);
+    background-color: #FCDD09;
     border: 2px solid #FFD700;
     border-radius: 15px;
     padding: 1rem 1.2rem;
@@ -258,10 +258,10 @@ except Exception as e:
 # ==========================
 # INTERFAZ PRINCIPAL
 # ==========================
-st.markdown("<div class='title-button'>🦜 Detector de Aves</div>", unsafe_allow_html=True)
+st.markdown("<div class='title-button'>🦜 Clasificación inteligente de aves del Tolima</div>", unsafe_allow_html=True)
 st.markdown("Sube una imagen de un ave y deja que el modelo prediga su especie.")
 
-st.markdown("<div class='subtitle-button'>📸 Sube tu imagen</div>", unsafe_allow_html=True)
+st.markdown("<div class='subtitle-button'>📸 Carga la imagen</div>", unsafe_allow_html=True)
 uploaded_file = st.file_uploader("Sube una imagen (JPG o PNG)", type=["jpg", "jpeg", "png"])
 
 if uploaded_file:
@@ -270,11 +270,11 @@ if uploaded_file:
 
     col1, col2 = st.columns([0.5, 0.5])
     with col1:
-        st.markdown("<div class='subtitle-button'>📸 Imagen subida</div>", unsafe_allow_html=True)
+        st.markdown("<div class='subtitle-button'>📸 Imagen cargada correctamente</div>", unsafe_allow_html=True)
         st.image(img_display, use_column_width=True)
 
     with col2:
-        if st.button("🔍 Clasificar ave"):
+        if st.button("🔍 Predecir especie"):
             with st.spinner("Analizando imagen..."):
                 img_array = preprocess_image(image)
                 results = predict_image(model, img_array, class_names, top_k=3)
@@ -287,7 +287,7 @@ if uploaded_file:
             normalized = normalizar(sci_name)
             found = next(
                 ((v[0], v[1]) for k, v in species_info.items() if normalized in k or k in normalized),
-                ("Nombre común no disponible", "Hábitat no disponible."),
+                ("Amazilia cyanifrons", "Hábitat no disponible."),
             )
 
             common_name, habitat = found
@@ -313,6 +313,7 @@ if uploaded_file:
             st.dataframe(df_pred, use_container_width=True)
 else:
     st.info("👆 Sube una imagen para comenzar la detección.")
+
 
 
 
