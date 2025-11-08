@@ -234,7 +234,7 @@ def predict_image(model, img_array, class_names, top_k=3):
 # CONFIGURACIÓN DE MODELO
 # ==========================
 model_options = {
-    "VGG16": os.path.join("modelos", "dataset_vgg16.keras"),
+    "VGG16": os.path.join("modelos", "vgg16_final.keras"),
     "NASNetMobile": os.path.join("modelos", "dataset_nasnetmobile.keras"),
 }
 CLASS_NAMES_PATH = "class_names.txt"
@@ -335,6 +335,7 @@ if uploaded_file:
             st.bar_chart(df_pred.set_index("Especie (modelo)"))
 else:
     st.info("👆 Sube una imagen para comenzar la clasificación.")
+
 
 
 
