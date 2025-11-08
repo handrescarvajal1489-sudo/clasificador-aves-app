@@ -10,7 +10,7 @@ import pandas as pd
 # CONFIGURACIÓN GENERAL
 # ==========================
 st.set_page_config(
-    page_title="Clasificación inteligente de aves del Tolima🦜",
+    page_title="DEEP LEARNING🦜",
     page_icon="🦜",
     layout="wide",
 )
@@ -23,20 +23,20 @@ st.markdown(
 <style>
 /* Fondo general amarillo clásico */
 .stApp {
-    background-color: #FCDD09 ;
+    background-color: #FCDD09;
 }
 
-/* Contenedor principal */
+/* Contenedor principal (zona central) */
 .block-container {
     background-color: #6D090D;
     padding: 2rem 2rem 3rem 2rem;
     border-radius: 16px;
 }
 
-/* Botones vino tinto para títulos */
+/* Botones vino tinto para títulos (ahora amarillos) */
 .title-button, .subtitle-button {
-    background-color: #FCDD09 ;
-    color:#6D090D !important;
+    background-color: #FCDD09;
+    color: #6D090D !important;
     padding: 10px 25px;
     border-radius: 12px;
     display: inline-block;
@@ -54,9 +54,9 @@ st.markdown(
     transform: scale(1.05);
 }
 
-/* Textos */
+/* Textos generales */
 h1, h2, h3, h4, label, p, span, li {
-    color: #111111;
+    color: #FBDDAB;
     font-family: 'Segoe UI', sans-serif;
 }
 
@@ -85,8 +85,6 @@ div.stButton > button:first-child {
     margin: 10px 0 !important;
     transition: all 0.25s ease-in-out !important;
 }
-
-/* Efecto hover (al pasar el cursor) */
 div.stButton > button:first-child:hover {
     background-color: #6D090D !important;
     color: #FCDD09 !important;
@@ -113,7 +111,7 @@ section[data-testid="stFileUploader"] button:hover {
 
 /* Texto del uploader */
 section[data-testid="stFileUploader"] * {
-    color: #111111 !important;
+    color: #FBDDAB !important;
     font-weight: 600;
 }
 
@@ -124,7 +122,7 @@ section[data-testid="stFileUploader"] * {
     border-radius: 15px;
     padding: 1rem 1.2rem;
     margin-top: 1rem;
-    color: #ffffff;
+    color: #6D090D; /* texto vino tinto para mejor contraste */
 }
 
 /* Marca de agua */
@@ -234,7 +232,7 @@ def predict_image(model, img_array, class_names, top_k=3):
     return [{"class_name": class_names[i], "prob": float(preds[i])} for i in indices]
 
 # ==========================
-# CONFIGURACIÓN DE MODELOS
+# CONFIGURACIÓN DE MODELOS (CON SIDEBAR COMPLETO)
 # ==========================
 model_options = {
     "VGG16": os.path.join("modelos", "dataset_final_defini.keras"),
@@ -250,7 +248,40 @@ try:
     model = load_model(MODEL_PATH)
     num_classes = model.output_shape[-1]
     class_names = load_class_names(num_classes, CLASS_NAMES_PATH)
+
+    # Mensaje de éxito y métricas
     st.sidebar.success(f"Modelo '{model_choice}' cargado correctamente ✅")
+    st.sidebar.metric("Nº de clases", num_classes)
+    st.sidebar.metric("Modelo activo", model_choice)
+
+    # Info del proyecto
+    st.sidebar.markdown("### 🧠 Sobre el proyecto")
+    st.sidebar.markdown(
+        f"""
+Clasificación inteligente de *aves del Tolima* usando redes neuronales
+con arquitecturas **VGG16** y **NASNetMobile**.
+
+- 🧬 Tipo de modelo: CNN  
+- 🐦 Especies entrenadas: **{num_classes}** clases  
+- 🎓 Autor: *Hollman Carvajal*  
+- 🏫 Universidad Cooperativa de Colombia – Sede Ibagué  
+"""
+    )
+
+    # Consejos de uso
+    st.sidebar.markdown("### 🪶 Consejos de uso")
+    st.sidebar.markdown(
+        """
+- Usa imágenes claras con el ave centrada.  
+- Evita fondos muy oscuros o desenfoques extremos.  
+- Formatos admitidos: **JPG** y **PNG**.  
+"""
+    )
+
+    # Tabla de especies
+    st.sidebar.markdown("### 🐥 Especies incluidas")
+    st.sidebar.dataframe(df_species, use_container_width=True)
+
 except Exception as e:
     st.error(f"Error al cargar el modelo: {e}")
     st.stop()
@@ -258,8 +289,13 @@ except Exception as e:
 # ==========================
 # INTERFAZ PRINCIPAL
 # ==========================
-st.markdown("<div class='title-button'>🦜 Clasificación inteligente de aves del Tolima</div>", unsafe_allow_html=True)
-st.markdown("Sube una imagen de un ave y deja que el modelo prediga su especie.")
+st.markdown(
+    "<div class='title-button'>🦜 Clasificación inteligente de aves del Tolima</div>",
+    unsafe_allow_html=True,
+)
+st.markdown(
+    "Sube una imagen de un ave y deja que el modelo prediga su especie basada en el entrenamiento con aves del Tolima."
+)
 
 st.markdown("<div class='subtitle-button'>📸 Carga la imagen</div>", unsafe_allow_html=True)
 uploaded_file = st.file_uploader("Sube una imagen (JPG o PNG)", type=["jpg", "jpeg", "png"])
@@ -270,7 +306,10 @@ if uploaded_file:
 
     col1, col2 = st.columns([0.5, 0.5])
     with col1:
-        st.markdown("<div class='subtitle-button'>📸 Imagen cargada correctamente</div>", unsafe_allow_html=True)
+        st.markdown(
+            "<div class='subtitle-button'>📸 Imagen cargada correctamente</div>",
+            unsafe_allow_html=True,
+        )
         st.image(img_display, use_column_width=True)
 
     with col2:
@@ -285,12 +324,14 @@ if uploaded_file:
 
             # búsqueda flexible por coincidencia parcial
             normalized = normalizar(sci_name)
-            found = next(
-                ((v[0], v[1]) for k, v in species_info.items() if normalized in k or k in normalized),
-                ("Amazilia cyanifrons", "Hábitat no disponible."),
+            common_name, habitat = next(
+                (
+                    (v[0], v[1])
+                    for k, v in species_info.items()
+                    if normalized in k or k in normalized
+                ),
+                ("Nombre común no disponible", "Hábitat no disponible."),
             )
-
-            common_name, habitat = found
 
             st.markdown(
                 f"""
@@ -305,15 +346,16 @@ if uploaded_file:
                 unsafe_allow_html=True,
             )
 
-            df_pred = pd.DataFrame({
-                "Especie (modelo)": [r["class_name"] for r in results],
-                "Probabilidad (%)": [round(r["prob"] * 100, 2) for r in results],
-            })
+            df_pred = pd.DataFrame(
+                {
+                    "Especie (modelo)": [r["class_name"] for r in results],
+                    "Probabilidad (%)": [round(r["prob"] * 100, 2) for r in results],
+                }
+            )
             st.markdown("### 📊 Tabla de predicciones")
             st.dataframe(df_pred, use_container_width=True)
 else:
     st.info("👆 Sube una imagen para comenzar la detección.")
-
 
 
 
