@@ -203,10 +203,23 @@ species_info = {
 # FUNCIONES
 # ==========================
 @st.cache_resource
-def load_model(model_path):
+def load_model(model_path: str):
+    """Carga el modelo .keras desde la ruta indicada."""
     if not os.path.exists(model_path):
         raise FileNotFoundError(f"No se encontró el modelo: {model_path}")
-    return tf.keras.models.load_model(model_path)
+    try:
+        # Para Keras 3 / TF recientes
+        return tf.keras.models.load_model(
+            model_path,
+            compile=False,
+            safe_mode=False,
+        )
+    except TypeError:
+        # Por si la versión de TF no soporta safe_mode
+        return tf.keras.models.load_model(
+            model_path,
+            compile=False,
+        )
 
 @st.cache_data
 def load_class_names(num_classes: int, path: str):
@@ -240,7 +253,10 @@ model_options = {
 CLASS_NAMES_PATH = "class_names.txt"
 
 st.sidebar.title("⚙ Configuración del modelo")
-model_choice = st.sidebar.selectbox("Selecciona el modelo a utilizar:", list(model_options.keys()))
+model_choice = st.sidebar.selectbox(
+    "Selecciona el modelo a utilizar:",
+    list(model_options.keys())
+)
 MODEL_PATH = model_options[model_choice]
 
 try:
@@ -329,12 +345,15 @@ if uploaded_file:
                 "Especie (modelo)": [r["class_name"] for r in results],
                 "Probabilidad (%)": [round(r["prob"] * 100, 2) for r in results],
             })
+
             st.markdown("### 📊 Tabla de predicciones (Top 3)")
             st.dataframe(df_pred, use_container_width=True)
+
             st.markdown("### 📈 Distribución de probabilidades")
             st.bar_chart(df_pred.set_index("Especie (modelo)"))
 else:
     st.info("👆 Sube una imagen para comenzar la clasificación.")
+
 
 
 
