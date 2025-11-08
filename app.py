@@ -33,7 +33,7 @@ st.markdown(
     border-radius: 16px;
 }
 
-/* Botones vino tinto para títulos (ahora amarillos) */
+/* Botones para títulos */
 .title-button, .subtitle-button {
     background-color: #FCDD09;
     color: #6D090D !important;
@@ -73,21 +73,21 @@ h1, h2, h3, h4, label, p, span, li {
 /* Botón principal (Predecir especie) */
 div.stButton > button:first-child {
     background-color: #FCDD09 !important;
-    color: #6D090D !important;
+    color: #000000 !important;                 /* 🔹 TEXTO NEGRO */
     font-weight: 800 !important;
     font-size: 18px !important;
     font-family: 'Segoe UI', sans-serif !important;
     border: 2px solid #5c1a1a !important;
     border-radius: 12px !important;
     padding: 10px 25px !important;
-    text-shadow: 0px 0px 3px rgba(0, 0, 0, 0.4);
+    text-shadow: 0px 0px 3px rgba(0, 0, 0, 0.2);
     box-shadow: 1px 2px 5px rgba(0, 0, 0, 0.4) !important;
     margin: 10px 0 !important;
     transition: all 0.25s ease-in-out !important;
 }
 div.stButton > button:first-child:hover {
     background-color: #6D090D !important;
-    color: #6D090D !important;
+    color: #FCDD09 !important;                 /* buen contraste en hover */
     transform: scale(1.05);
 }
 
@@ -124,8 +124,6 @@ section[data-testid="stFileUploader"] * {
     margin-top: 1rem;
     color: #FCDD09;                    /* texto amarillo */
 }
-
-{
 .result-box h2, 
 .result-box h3, 
 .result-box p, 
@@ -134,19 +132,19 @@ section[data-testid="stFileUploader"] * {
     color: #FCDD09 !important;         /* todos los textos amarillos */
 }
 
-/* Marca de agua */
+/* Marca de agua centrada abajo */
 .watermark {
     position: fixed;
     left: 50%;
-    bottom: 20px;
+    bottom: 5px;                       /* bien abajo */
     transform: translateX(-50%);
     font-size: 15px;
     font-weight: 600;
     color: rgba(0, 0, 0, 0.8);
     z-index: 9999;
+    text-align: center;
+    width: 100%;
 }
-
-
 </style>
 """,
     unsafe_allow_html=True,
@@ -260,12 +258,10 @@ try:
     num_classes = model.output_shape[-1]
     class_names = load_class_names(num_classes, CLASS_NAMES_PATH)
 
-    # Mensaje de éxito y métricas
     st.sidebar.success(f"Modelo '{model_choice}' cargado correctamente ✅")
     st.sidebar.metric("Nº de clases", num_classes)
     st.sidebar.metric("Modelo activo", model_choice)
 
-    # Info del proyecto
     st.sidebar.markdown("### 🧠 Sobre el proyecto")
     st.sidebar.markdown(
         f"""
@@ -279,7 +275,6 @@ con arquitecturas **VGG16** y **NASNetMobile**.
 """
     )
 
-    # Consejos de uso
     st.sidebar.markdown("### 🪶 Consejos de uso")
     st.sidebar.markdown(
         """
@@ -289,7 +284,6 @@ con arquitecturas **VGG16** y **NASNetMobile**.
 """
     )
 
-    # Tabla de especies
     st.sidebar.markdown("### 🐥 Especies incluidas")
     st.sidebar.dataframe(df_species, use_container_width=True)
 
@@ -333,7 +327,6 @@ if uploaded_file:
             sci_name = top_pred["class_name"].replace("_", " ").strip()
             prob = top_pred["prob"] * 100
 
-            # búsqueda flexible por coincidencia parcial
             normalized = normalizar(sci_name)
             common_name, habitat = next(
                 (
@@ -341,7 +334,7 @@ if uploaded_file:
                     for k, v in species_info.items()
                     if normalized in k or k in normalized
                 ),
-                ("Colibrí gorriazul", "Hábitat no disponible."),
+                ("Nombre común no disponible", "Hábitat no disponible."),
             )
 
             st.markdown(
@@ -357,19 +350,21 @@ if uploaded_file:
                 unsafe_allow_html=True,
             )
 
+            # Tabla de Top 3
             df_pred = pd.DataFrame(
                 {
                     "Especie (modelo)": [r["class_name"] for r in results],
                     "Probabilidad (%)": [round(r["prob"] * 100, 2) for r in results],
                 }
             )
-            st.markdown("### 📊 Tabla de predicciones")
+            st.markdown("### 📊 Tabla de predicciones (Top 3)")
             st.dataframe(df_pred, use_container_width=True)
+
+            # 📈 Gráfica de barras de las 3 especies
+            st.markdown("### 📈 Distribución de probabilidades (Top 3)")
+            st.bar_chart(df_pred.set_index("Especie (modelo)"))
 else:
     st.info("👆 Sube una imagen para comenzar la detección.")
-
-
-
 
 
 
