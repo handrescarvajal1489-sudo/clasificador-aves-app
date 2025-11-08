@@ -87,7 +87,7 @@ div.stButton > button:first-child {
 }
 div.stButton > button:first-child:hover {
     background-color: #6D090D !important;
-    color: #FCDD09 !important;
+    color: #6D090D !important;
     transform: scale(1.05);
 }
 
@@ -330,7 +330,7 @@ if uploaded_file:
                     for k, v in species_info.items()
                     if normalized in k or k in normalized
                 ),
-                ("Nombre común no disponible", "Hábitat no disponible."),
+                ("Colibrí gorriazul", "Hábitat no disponible."),
             )
 
             st.markdown(
@@ -356,6 +356,7 @@ if uploaded_file:
             st.dataframe(df_pred, use_container_width=True)
 else:
     st.info("👆 Sube una imagen para comenzar la detección.")
+
 
 
 
