@@ -30,7 +30,7 @@ st.markdown("""
     );
 }
 
-/* Contenedor principal transparente */
+/* Contenedor principal ligeramente transparente */
 .block-container {
     background-color: rgba(0, 0, 0, 0.03);
     padding: 2rem 2rem 3rem 2rem;
@@ -38,9 +38,23 @@ st.markdown("""
     margin-top: 1rem;
 }
 
-/* Títulos */
-h1, h2, h3, h4 {
-    color: #ffffff;
+/* Títulos: h1 blanco (en franja vino), h2–h4 negros (sobre amarillo) */
+h1 {
+    color: #ffffff !important;
+    font-family: 'Segoe UI', sans-serif;
+}
+h2, h3, h4 {
+    color: #111111 !important;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* Texto general en el contenido principal en negro */
+.block-container, 
+.block-container p,
+.block-container li,
+.block-container span,
+.block-container label {
+    color: #111111;
     font-family: 'Segoe UI', sans-serif;
 }
 
@@ -58,7 +72,8 @@ h1, h2, h3, h4 {
 }
 
 [data-testid="stSidebar"] p,
-[data-testid="stSidebar"] li {
+[data-testid="stSidebar"] li,
+[data-testid="stSidebar"] span {
     color: #f5f5f5;
     font-size: 14px;
 }
@@ -90,7 +105,7 @@ div.stButton > button:first-child:hover {
     color: #ffffff;
 }
 
-/* Marca de agua centrada */
+/* Marca de agua centrada, en negro */
 .watermark {
     position: fixed;
     left: 50%;
@@ -98,7 +113,7 @@ div.stButton > button:first-child:hover {
     transform: translateX(-50%);
     font-size: 15px;
     font-weight: 600;
-    color: rgba(0, 0, 0, 0.4);
+    color: rgba(0, 0, 0, 0.8);  /* negro con ligera transparencia */
     z-index: 9999;
     pointer-events: none;
     font-family: 'Segoe UI', sans-serif;
@@ -139,7 +154,6 @@ model_choice = st.sidebar.selectbox(
 MODEL_PATH = model_options[model_choice]
 CLASS_NAMES_PATH = "class_names.txt"
 
-# Tamaño de imagen
 IMG_SIZE = (224, 224)
 
 # ==========================
@@ -189,12 +203,12 @@ try:
     # CONTEXTO DEL PROYECTO
     st.sidebar.markdown("### ℹ️ Sobre el proyecto")
     st.sidebar.markdown(f"""
-Proyecto académico desarrollado como demostración de un sistema de **clasificación de aves colombianas**
+Proyecto académico que implementa un **clasificador de aves colombianas**
 mediante modelos de **Deep Learning (CNN)**.
 
-- 🧠 Arquitecturas: `VGG16` y `NASNetMobile`
-- 🐦 Especies reconocibles: **{num_classes}**
-- 🎓 Autor: *Hollman Carvajal - Universidad Cooperativa*
+- 🧠 Arquitecturas: `VGG16` y `NASNetMobile`  
+- 🐦 Especies reconocibles: **{num_classes}**  
+- 🎓 Autor: *Hollman Carvajal - Universidad Cooperativa*  
 - 🧪 Enfoque: Procesamiento de imágenes y predicción visual.
 """)
 
@@ -206,29 +220,46 @@ mediante modelos de **Deep Learning (CNN)**.
 """)
 
     # ==========================
-    # TABLA DE ESPECIES EN EL LATERAL
+    # TABLA DE ESPECIES EN EL LATERAL (CON EMOJIS)
     # ==========================
     st.sidebar.markdown("### 🐥 Especies clasificadas")
 
     data = {
         "Especie científica": [
-            "Amazilia cyaninfrons", "Anthocephala berlepschi", "Atlapetes flaviceps",
-            "Bolborhynchus ferrugineifrons", "Crax alberti", "Euphonia concinna",
-            "Hapalopsittaca fuertesi", "Leptotila conoveri", "Ognorhynchus icterotis",
+            "Amazilia cyaninfrons",
+            "Anthocephala berlepschi",
+            "Atlapetes flaviceps",
+            "Bolborhynchus ferrugineifrons",
+            "Crax alberti",
+            "Euphonia concinna",
+            "Hapalopsittaca fuertesi",
+            "Leptotila conoveri",
+            "Ognorhynchus icterotis",
             "Pyrocephalus rubinus"
         ],
         "Nombre común": [
-            "Colibrí Gorriiazul", "Colibrí Cabecicastaño Andino", "Pinzón Cabeciamarillo",
-            "Periquito de los Nevados", "Paujil Colombiano", "Eufonia del Magdalena",
-            "Loro Coroniazul", "Paloma Montaraz de Tolima", "Loro Orejiamarillo",
-            "Atrapamoscas Pechirrojo"
+            "🐦 Colibrí Gorriiazul",
+            "🐦 Colibrí Cabecicastaño Andino",
+            "🐦 Pinzón Cabeciamarillo",
+            "🦜 Periquito de los Nevados",
+            "🦃 Paujil Colombiano",
+            "🐦 Eufonia del Magdalena",
+            "🦜 Loro Coroniazul",
+            "🕊️ Paloma Montaraz de Tolima",
+            "🦜 Loro Orejiamarillo",
+            "🐦 Atrapamoscas Pechirrojo"
         ],
         "Hábitat": [
-            "Zonas andinas y subandinas", "Bosques andinos (Ibagué, Villahermosa)",
-            "Bordes de bosque (Tolima Central)", "Páramos (PNN Los Nevados, Murillo)",
-            "Bosques húmedos del Magdalena medio", "Valle del río Magdalena",
-            "Bosques de niebla (Andes Centrales)", "Bosques andinos (El Líbano, Roncesvalles)",
-            "Bosques de Palma de Cera (PNN Los Nevados)", "Zonas abiertas cerca de agua"
+            "🌄 Zonas andinas y subandinas.",
+            "🌲 Endémico: Bosques andinos y subandinos (Ibagué, Villahermosa).",
+            "🌲 Bosques y bordes de bosque (Tolima Central).",
+            "🏔️ Páramos y zonas altas (PNN Los Nevados, Murillo).",
+            "💧 Bosques húmedos del Magdalena medio (Norte del Tolima).",
+            "🌞 Valle del río Magdalena, zonas bajas y cálidas.",
+            "🌫️ Bosques de niebla, Andes Centrales (límites con Quindío).",
+            "🌲 Endémico: Bosques andinos y subandinos (El Líbano, Roncesvalles).",
+            "🌴 Bosques de Palma de Cera (PNN Los Nevados).",
+            "🏞️ Zonas abiertas cerca de agua (Flandes, Espinal)."
         ]
     }
 
@@ -248,7 +279,10 @@ uploaded_file = st.file_uploader(
     type=["jpg", "jpeg", "png"]
 )
 
-st.markdown("Una vez cargues la imagen, pulsa **Clasificar ave** para ver las 3 especies más probables.")
+st.markdown(
+    "Una vez cargues la imagen, pulsa **Clasificar ave** para ver las "
+    "3 especies más probables."
+)
 
 if uploaded_file:
     image = Image.open(uploaded_file)
