@@ -17,7 +17,8 @@ st.set_page_config(
 # ==========================
 # ESTILO PERSONALIZADO
 # ==========================
-st.markdown("""
+st.markdown(
+    """
 <style>
 /* Fondo general */
 .stApp {
@@ -144,12 +145,14 @@ section[data-testid="stFileUploader"] * {
     z-index: 9999;
 }
 </style>
-""", unsafe_allow_html=True)
+""",
+    unsafe_allow_html=True,
+)
 
 # Marca de agua
 st.markdown(
     "<div class='watermark'>Hollman Carvajal - Universidad Cooperativa</div>",
-    unsafe_allow_html=True
+    unsafe_allow_html=True,
 )
 
 # ==========================
@@ -200,7 +203,7 @@ species_info = {
 }
 
 # ==========================
-# FUNCIONES
+# FUNCIONES AUXILIARES
 # ==========================
 @st.cache_resource
 def load_model(model_path: str):
@@ -208,18 +211,17 @@ def load_model(model_path: str):
     if not os.path.exists(model_path):
         raise FileNotFoundError(f"No se encontró el modelo: {model_path}")
     try:
-        # Para Keras 3 / TF recientes
         return tf.keras.models.load_model(
             model_path,
             compile=False,
             safe_mode=False,
         )
     except TypeError:
-        # Por si la versión de TF no soporta safe_mode
         return tf.keras.models.load_model(
             model_path,
             compile=False,
         )
+
 
 @st.cache_data
 def load_class_names(num_classes: int, path: str):
@@ -233,18 +235,23 @@ def load_class_names(num_classes: int, path: str):
             return names
     return [f"Clase {i}" for i in range(num_classes)]
 
-def preprocess_image(img, size=(224, 224)):
+
+def preprocess_image(img: Image.Image, size=(224, 224)):
+    """Convierte la imagen a RGB, la redimensiona y normaliza."""
     img = img.convert("RGB").resize(size)
     arr = np.array(img).astype("float32") / 255.0
     return np.expand_dims(arr, 0)
 
+
 def predict_image(model, img_array, class_names, top_k=3):
-    preds = model.predict(img_array)[0]
+    """Devuelve las top-k predicciones del modelo."""
+    preds = model.predict(img_array, verbose=0)[0]
     indices = np.argsort(preds)[::-1][:top_k]
     return [{"class_name": class_names[i], "prob": float(preds[i])} for i in indices]
 
+
 # ==========================
-# CONFIGURACIÓN DE MODELO
+# CONFIGURACIÓN DE MODELOS
 # ==========================
 model_options = {
     "VGG16": os.path.join("modelos", "dataset_final_defini.keras"),
@@ -255,8 +262,9 @@ CLASS_NAMES_PATH = "class_names.txt"
 st.sidebar.title("⚙ Configuración del modelo")
 model_choice = st.sidebar.selectbox(
     "Selecciona el modelo a utilizar:",
-    list(model_options.keys())
+    list(model_options.keys()),
 )
+
 MODEL_PATH = model_options[model_choice]
 
 try:
@@ -269,21 +277,25 @@ try:
     st.sidebar.metric("Modelo activo", model_choice)
 
     st.sidebar.markdown("### 🧠 Sobre el proyecto")
-    st.sidebar.markdown(f"""
+    st.sidebar.markdown(
+        f"""
 Proyecto académico que implementa un *clasificador de aves colombianas* mediante *Deep Learning (CNN)*.
 
 - 🧬 Arquitecturas: VGG16 y NASNetMobile  
 - 🐦 Especies reconocibles: *{num_classes}*  
 - 🎓 Autor: Hollman Carvajal - Universidad Cooperativa  
 - 🧪 Enfoque: Procesamiento de imágenes y predicción visual.
-""")
+"""
+    )
 
     st.sidebar.markdown("### 🪶 Consejos de uso")
-    st.sidebar.markdown("""
+    st.sidebar.markdown(
+        """
 - Usa imágenes claras, con el ave centrada.  
 - Evita sombras o fondos muy oscuros.  
 - Formatos admitidos: *JPG / PNG*.  
-""")
+"""
+    )
 
     st.sidebar.markdown("### 🐥 Especies clasificadas")
     st.sidebar.dataframe(df_species, use_container_width=True)
@@ -296,26 +308,41 @@ except Exception as e:
 # INTERFAZ PRINCIPAL
 # ==========================
 st.title("🦜 Clasificador de Aves")
-st.markdown("Sube una imagen de un ave y deja que el modelo de Deep Learning prediga la especie.")
+st.markdown(
+    "Sube una imagen de un ave y deja que el modelo de Deep Learning prediga la especie."
+)
 
 st.subheader("📸 Sube tu imagen")
 uploaded_file = st.file_uploader(
     "Sube una imagen de un ave (JPG o PNG)",
-    type=["jpg", "jpeg", "png"]
+    type=["jpg", "jpeg", "png"],
 )
 
-st.markdown("Una vez cargues la imagen, pulsa *Clasificar ave* para ver las 3 especies más probables.")
+st.markdown(
+    "Una vez cargues la imagen, pulsa *Clasificar ave* para ver las 3 especies más probables."
+)
 
-if uploaded_file:
-    image = Image.open(uploaded_file)
+if uploaded_file is not None:
+    # Intentar abrir la imagen de forma segura
+    try:
+        image = Image.open(uploaded_file)
+        image = image.convert("RGB")
+    except Exception as e:
+        st.error(f"No se pudo abrir la imagen. Asegúrate de que sea un archivo JPG o PNG válido. Detalle: {e}")
+        st.stop()
+
     col1, col2 = st.columns([0.5, 0.5])
 
     with col1:
-        st.markdown('<div class="btn-red">📸 Imagen subida</div>', unsafe_allow_html=True)
+        st.markdown(
+            '<div class="btn-red">📸 Imagen subida</div>', unsafe_allow_html=True
+        )
         st.image(image, use_container_width=True)
 
     with col2:
-        st.markdown('<div class="btn-red">🔍 Predicción</div>', unsafe_allow_html=True)
+        st.markdown(
+            '<div class="btn-red">🔍 Predicción</div>', unsafe_allow_html=True
+        )
 
         if st.button("🔍 Clasificar ave", key="predict_button"):
             with st.spinner("Analizando imagen..."):
@@ -328,10 +355,11 @@ if uploaded_file:
 
             common_name, habitat = species_info.get(
                 sci_name,
-                ("Nombre común no disponible", "Hábitat no disponible.")
+                ("Nombre común no disponible", "Hábitat no disponible."),
             )
 
-            st.markdown(f"""
+            st.markdown(
+                f"""
             <div class='result-box'>
                 <h3>🏆 Especie más probable</h3>
                 <h2>{common_name}</h2>
@@ -339,12 +367,16 @@ if uploaded_file:
                 <p><b>Confianza:</b> {prob:.2f}%</p>
                 <p><b>Hábitat:</b> {habitat}</p>
             </div>
-            """, unsafe_allow_html=True)
+            """,
+                unsafe_allow_html=True,
+            )
 
-            df_pred = pd.DataFrame({
-                "Especie (modelo)": [r["class_name"] for r in results],
-                "Probabilidad (%)": [round(r["prob"] * 100, 2) for r in results],
-            })
+            df_pred = pd.DataFrame(
+                {
+                    "Especie (modelo)": [r["class_name"] for r in results],
+                    "Probabilidad (%)": [round(r["prob"] * 100, 2) for r in results],
+                }
+            )
 
             st.markdown("### 📊 Tabla de predicciones (Top 3)")
             st.dataframe(df_pred, use_container_width=True)
@@ -353,7 +385,6 @@ if uploaded_file:
             st.bar_chart(df_pred.set_index("Especie (modelo)"))
 else:
     st.info("👆 Sube una imagen para comenzar la clasificación.")
-
 
 
 
