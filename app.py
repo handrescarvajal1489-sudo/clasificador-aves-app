@@ -70,7 +70,7 @@ h1, h2, h3, h4, label, p, span, li {
     font-family: 'Segoe UI', sans-serif;
 }
 
-/* Botón principal (Realizar detección) */
+/* Botón principal (Predecir especie) */
 div.stButton > button:first-child {
     background-color: #FCDD09 !important;
     color: #6D090D !important;
@@ -122,7 +122,7 @@ section[data-testid="stFileUploader"] * {
     border-radius: 15px;
     padding: 1rem 1.2rem;
     margin-top: 1rem;
-    color: #6D090D; /* texto vino tinto para mejor contraste */
+    color: #080700; /* texto vino tinto para mejor contraste */
 }
 
 /* Marca de agua */
@@ -356,6 +356,7 @@ if uploaded_file:
             st.dataframe(df_pred, use_container_width=True)
 else:
     st.info("👆 Sube una imagen para comenzar la detección.")
+
 
 
 
