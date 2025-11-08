@@ -57,22 +57,25 @@ h2, h3, h4, label, p, span, li {
     font-family: 'Segoe UI', sans-serif;
 }
 
-/* Botones principales */
-div.stButton > button:first-child {
+/* Botones principales (Clasificar, Predicción, Imagen subida) */
+.btn-red {
     background-color: #8b2b2b;
-    color: #ffffff !important;
+    color: white !important;
+    padding: 10px 18px;
     border-radius: 10px;
-    font-size: 16px;
-    padding: 0.6em 1.3em;
-    font-weight: 600;
-    border: none;
-    transition: all 0.2s ease-in-out;
+    display: inline-block;
+    font-weight: bold;
+    font-size: 18px;
     box-shadow: 1px 1px 4px rgba(0,0,0,0.3);
+    margin-bottom: 10px;
+    border: none;
+    text-align: center;
+    transition: all 0.25s ease-in-out;
 }
-div.stButton > button:first-child:hover {
+.btn-red:hover {
     background-color: #6A0000;
     color: #FFD700 !important;
-    transform: scale(1.03);
+    transform: scale(1.05);
 }
 
 /* Caja resultado */
@@ -88,9 +91,10 @@ div.stButton > button:first-child:hover {
 /* Botón del uploader (Browse files) */
 section[data-testid="stFileUploader"] button {
     color: #ffffff !important;
-    border: 1px solid #ffffff !important;
+    border: 1.5px solid #FFD700 !important;
     background-color: transparent !important;
     transition: all 0.3s ease-in-out;
+    font-weight: 600;
 }
 section[data-testid="stFileUploader"] button:hover {
     background-color: #8b2b2b !important;
@@ -164,6 +168,7 @@ species_table = {
         "Zonas abiertas cerca de agua (Flandes, Espinal).",
     ],
 }
+
 df_species = pd.DataFrame(species_table)
 species_info = {
     row["Especie científica"]: (row["Nombre común"], row["Hábitat"])
@@ -266,60 +271,11 @@ if uploaded_file:
     col1, col2 = st.columns([0.5, 0.5])
 
     with col1:
-        st.markdown("""
-        <div style="
-            background-color: #8b2b2b;
-            color: white;
-            padding: 10px 18px;
-            border-radius: 10px;
-            display: inline-block;
-            font-weight: bold;
-            font-size: 18px;
-            box-shadow: 1px 1px 4px rgba(0,0,0,0.3);
-            margin-bottom: 10px;">
-            📸 Imagen subida
-        </div>
-        """, unsafe_allow_html=True)
+        st.markdown('<div class="btn-red">📸 Imagen subida</div>', unsafe_allow_html=True)
         st.image(image, use_container_width=True)
 
     with col2:
-        st.markdown("""
-        <div style="
-            background-color: #8b2b2b;
-            color: white;
-            padding: 10px 18px;
-            border-radius: 10px;
-            display: inline-block;
-            font-weight: bold;
-            font-size: 18px;
-            box-shadow: 1px 1px 4px rgba(0,0,0,0.3);
-            margin-bottom: 10px;">
-            🔍 Predicción
-        </div>
-        """, unsafe_allow_html=True)
-
-        # BOTÓN CLASIFICAR AVE - IGUAL ESTILO
-        st.markdown("""
-        <style>
-        .clasificar-btn {
-            background-color: #8b2b2b;
-            color: white;
-            border: none;
-            padding: 10px 22px;
-            font-size: 16px;
-            font-weight: 600;
-            border-radius: 10px;
-            box-shadow: 1px 1px 4px rgba(0,0,0,0.3);
-            transition: all 0.2s ease-in-out;
-            cursor: pointer;
-        }
-        .clasificar-btn:hover {
-            background-color: #6A0000;
-            color: #FFD700;
-            transform: scale(1.03);
-        }
-        </style>
-        """, unsafe_allow_html=True)
+        st.markdown('<div class="btn-red">🔍 Predicción</div>', unsafe_allow_html=True)
 
         if st.button("🔍 Clasificar ave", key="predict_button"):
             with st.spinner("Analizando imagen..."):
@@ -355,6 +311,7 @@ if uploaded_file:
             st.bar_chart(df_pred.set_index("Especie (modelo)"))
 else:
     st.info("👆 Sube una imagen para comenzar la clasificación.")
+
 
 
 
