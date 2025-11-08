@@ -1,4 +1,7 @@
-streamlit
-tensorflow
-Pillow
+streamlit==1.39.0
+tensorflow==2.20.0
+keras==3.10.0
+pillow
 numpy
+pandas
+
