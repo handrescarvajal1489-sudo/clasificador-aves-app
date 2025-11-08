@@ -30,37 +30,33 @@ st.markdown("""
     );
 }
 
-/* Contenedor */
+/* Contenedor principal */
 .block-container {
     background-color: rgba(0, 0, 0, 0.03);
     padding: 2rem 2rem 3rem 2rem;
     border-radius: 16px;
 }
 
-/* Títulos */
-h1 { color: #ffffff !important; }
-h2, h3, h4, label, p, span, li { color: #111111 !important; }
-
-/* Sidebar */
-[data-testid="stSidebar"] {
-    background-color: #161921;
-    border-right: 3px solid #8b2b2b;
-}
-
-/* Títulos del sidebar en blanco */
-[data-testid="stSidebar"] h1,
-[data-testid="stSidebar"] h2,
-[data-testid="stSidebar"] h3 {
+/* Título principal en blanco */
+h1 {
     color: #ffffff !important;
     font-family: 'Segoe UI', sans-serif;
 }
 
-/* Texto del sidebar */
-[data-testid="stSidebar"] p,
-[data-testid="stSidebar"] li,
-[data-testid="stSidebar"] span {
-    color: #f5f5f5;
-    font-size: 14px;
+/* Resto de textos en el cuerpo (negro) */
+h2, h3, h4, label, p, span, li {
+    color: #111111;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* === SIDEBAR: todo en blanco === */
+[data-testid="stSidebar"] {
+    background-color: #161921;
+    border-right: 3px solid #8b2b2b;
+}
+[data-testid="stSidebar"] * {
+    color: #ffffff !important;
+    font-family: 'Segoe UI', sans-serif;
 }
 
 /* Botones */
@@ -87,9 +83,12 @@ div.stButton > button:first-child:hover {
     color: #ffffff;
 }
 
-/* Texto dentro del uploader */
-section[data-testid="stFileUploader"] div {
-    color: white !important;
+/* === Uploader: texto y botón en blanco === */
+section[data-testid="stFileUploader"] * {
+    color: #ffffff !important;
+}
+section[data-testid="stFileUploader"] button {
+    border-color: #ffffff;
 }
 
 /* Marca de agua */
@@ -113,19 +112,53 @@ st.markdown(
 )
 
 # ==========================
-# DATOS DE ESPECIES
+# DATOS DE ESPECIES (TABLA + DESCRIPCIÓN)
 # ==========================
+species_table = {
+    "Especie científica": [
+        "Amazilia cyaninfrons",
+        "Anthocephala berlepschi",
+        "Atlapetes flaviceps",
+        "Bolborhynchus ferrugineifrons",
+        "Crax alberti",
+        "Euphonia concinna",
+        "Hapalopsittaca fuertesi",
+        "Leptotila conoveri",
+        "Ognorhynchus icterotis",
+        "Pyrocephalus rubinus",
+    ],
+    "Nombre común": [
+        "Colibrí Gorriiazul",
+        "Colibrí Cabecicastaño Andino",
+        "Pinzón Cabeciamarillo / Gorrión de Anteojos",
+        "Lorito Cadillero / Periquito de los Nevados",
+        "Paujil Colombiano",
+        "Eufonia del Magdalena",
+        "Loro Coroniazul",
+        "Paloma Montaraz de Tolima / Caminera Tolimense",
+        "Loro Orejiamarillo",
+        "Atrapamoscas Pechirrojo",
+    ],
+    "Hábitat": [
+        "Zonas andinas y subandinas.",
+        "Endémico: Bosques andinos y subandinos (Ibagué, Villahermosa).",
+        "Endémico: Bosques y bordes de bosque (Villa Hermosa, Tolima Central).",
+        "Páramos y zonas altas (PNN Los Nevados, Murillo).",
+        "Especie en peligro. Bosques húmedos del Magdalena medio (Norte del Tolima).",
+        "Valle del río Magdalena, zonas bajas y cálidas.",
+        "Bosques de niebla, Andes Centrales (límites con Quindío).",
+        "Endémico: Bosques andinos y subandinos (El Líbano, Roncesvalles).",
+        "Bosques de Palma de Cera (PNN Los Nevados).",
+        "Zonas abiertas cerca de agua (Flandes, Espinal).",
+    ],
+}
+
+df_species = pd.DataFrame(species_table)
+
+# Diccionario para descripción al predecir
 species_info = {
-    "Amazilia cyaninfrons": ("Colibrí Gorriiazul", "🌄 Zonas andinas y subandinas."),
-    "Anthocephala berlepschi": ("Colibrí Cabecicastaño Andino", "🌲 Endémico: Bosques andinos y subandinos (Ibagué, Villahermosa)."),
-    "Atlapetes flaviceps": ("Pinzón Cabeciamarillo", "🌲 Bosques y bordes de bosque (Tolima Central)."),
-    "Bolborhynchus ferrugineifrons": ("Periquito de los Nevados", "🏔️ Páramos y zonas altas (PNN Los Nevados, Murillo)."),
-    "Crax alberti": ("Paujil Colombiano", "💧 Bosques húmedos del Magdalena medio (Norte del Tolima)."),
-    "Euphonia concinna": ("Eufonia del Magdalena", "🌞 Valle del río Magdalena, zonas bajas y cálidas."),
-    "Hapalopsittaca fuertesi": ("Loro Coroniazul", "🌫️ Bosques de niebla, Andes Centrales (límites con Quindío)."),
-    "Leptotila conoveri": ("Paloma Montaraz de Tolima", "🌲 Endémico: Bosques andinos y subandinos (El Líbano, Roncesvalles)."),
-    "Ognorhynchus icterotis": ("Loro Orejiamarillo", "🌴 Bosques de Palma de Cera (PNN Los Nevados)."),
-    "Pyrocephalus rubinus": ("Atrapamoscas Pechirrojo", "🏞️ Zonas abiertas cerca de agua (Flandes, Espinal).")
+    row["Especie científica"]: (row["Nombre común"], row["Hábitat"])
+    for _, row in df_species.iterrows()
 }
 
 # ==========================
@@ -133,7 +166,21 @@ species_info = {
 # ==========================
 @st.cache_resource
 def load_model(model_path):
+    if not os.path.exists(model_path):
+        raise FileNotFoundError(f"No se encontró el modelo: {model_path}")
     return tf.keras.models.load_model(model_path)
+
+@st.cache_data
+def load_class_names(num_classes: int, path: str):
+    if os.path.exists(path):
+        with open(path, "r", encoding="utf-8") as f:
+            names = [line.strip() for line in f if line.strip()]
+        if len(names) >= num_classes:
+            return names[:num_classes]
+        else:
+            names += [f"Clase {i}" for i in range(len(names), num_classes)]
+            return names
+    return [f"Clase {i}" for i in range(num_classes)]
 
 def preprocess_image(img, size=(224, 224)):
     img = img.convert("RGB").resize(size)
@@ -161,13 +208,13 @@ MODEL_PATH = model_options[model_choice]
 try:
     model = load_model(MODEL_PATH)
     num_classes = model.output_shape[-1]
-    with open(CLASS_NAMES_PATH, "r", encoding="utf-8") as f:
-        class_names = [line.strip() for line in f if line.strip()]
+    class_names = load_class_names(num_classes, CLASS_NAMES_PATH)
 
     st.sidebar.success(f"Modelo '{model_choice}' cargado correctamente ✅")
     st.sidebar.metric("Nº de clases", num_classes)
     st.sidebar.metric("Modelo activo", model_choice)
 
+    # Sobre el proyecto
     st.sidebar.markdown("### 🧠 Sobre el proyecto")
     st.sidebar.markdown(f"""
 Proyecto académico que implementa un **clasificador de aves colombianas** mediante **Deep Learning (CNN)**.
@@ -178,12 +225,17 @@ Proyecto académico que implementa un **clasificador de aves colombianas** media
 - 🧪 Enfoque: Procesamiento de imágenes y predicción visual.
 """)
 
+    # Consejos de uso
     st.sidebar.markdown("### 🪶 Consejos de uso")
     st.sidebar.markdown("""
 - Usa imágenes claras, con el ave centrada.  
 - Evita sombras o fondos muy oscuros.  
 - Formatos admitidos: **JPG / PNG**.  
 """)
+
+    # Tabla lateral de especies
+    st.sidebar.markdown("### 🐥 Especies clasificadas")
+    st.sidebar.dataframe(df_species, use_container_width=True)
 
 except Exception as e:
     st.error(f"Error al cargar el modelo: {e}")
@@ -192,8 +244,14 @@ except Exception as e:
 # ==========================
 # INTERFAZ PRINCIPAL
 # ==========================
+st.title("🦜 Clasificador de Aves")
+st.markdown("Sube una imagen de un ave y deja que el modelo de *Deep Learning* prediga la especie.")
+
 st.subheader("📸 Sube tu imagen")
-uploaded_file = st.file_uploader("Sube una imagen de un ave (JPG o PNG)", type=["jpg", "jpeg", "png"])
+uploaded_file = st.file_uploader(
+    "Sube una imagen de un ave (JPG o PNG)",
+    type=["jpg", "jpeg", "png"]
+)
 
 st.markdown("Una vez cargues la imagen, pulsa **Clasificar ave** para ver las 3 especies más probables.")
 
@@ -212,36 +270,44 @@ if uploaded_file:
                 img_array = preprocess_image(image)
                 results = predict_image(model, img_array, class_names, top_k=3)
 
+            # Top 1
             top_pred = results[0]
-            name = top_pred["class_name"]
+            raw_name = top_pred["class_name"]
             prob = top_pred["prob"] * 100
 
-            # Buscar información
-            info = species_info.get(name, ("Especie desconocida", "Sin información disponible."))
-            common_name, habitat = info
+            # Normalizar nombre (por si viene con guiones bajos)
+            sci_name = raw_name.replace("_", " ")
+
+            common_name, habitat = species_info.get(
+                sci_name,
+                ("Nombre común no disponible", "Hábitat no disponible.")
+            )
 
             st.markdown(f"""
             <div class='result-box'>
                 <h3>🏆 Especie más probable</h3>
                 <h2>{common_name}</h2>
-                <p><b>Nombre científico:</b> <i>{name}</i></p>
+                <p><b>Nombre científico:</b> <i>{sci_name}</i></p>
                 <p><b>Confianza:</b> {prob:.2f}%</p>
                 <p><b>Hábitat:</b> {habitat}</p>
             </div>
             """, unsafe_allow_html=True)
 
             # Tabla de resultados
-            df = pd.DataFrame({
-                "Especie": [r["class_name"] for r in results],
-                "Probabilidad (%)": [round(r["prob"]*100, 2) for r in results]
+            df_pred = pd.DataFrame({
+                "Especie (modelo)": [r["class_name"] for r in results],
+                "Probabilidad (%)": [round(r["prob"] * 100, 2) for r in results],
             })
+
             st.markdown("### 📊 Tabla de predicciones (Top 3)")
-            st.dataframe(df, use_container_width=True)
+            st.dataframe(df_pred, use_container_width=True)
 
             st.markdown("### 📈 Distribución de probabilidades")
-            st.bar_chart(df.set_index("Especie"))
+            st.bar_chart(df_pred.set_index("Especie (modelo)"))
 else:
     st.info("👆 Sube una imagen para comenzar la clasificación.")
+
+
 
 
 
