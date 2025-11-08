@@ -10,7 +10,7 @@ import pandas as pd
 # CONFIGURACIÓN GENERAL
 # ==========================
 st.set_page_config(
-    page_title="Detector de Aves 🦜",
+    page_title="Clasificación inteligente de aves del Tolima🦜",
     page_icon="🦜",
     layout="wide",
 )
@@ -36,7 +36,7 @@ st.markdown(
 /* Botones vino tinto para títulos */
 .title-button, .subtitle-button {
     background-color: #FCDD09 ;
-    color:#120000 !important;
+    color:#6D090D !important;
     padding: 10px 25px;
     border-radius: 12px;
     display: inline-block;
@@ -70,10 +70,10 @@ h1, h2, h3, h4, label, p, span, li {
     font-family: 'Segoe UI', sans-serif;
 }
 
-/* Botón principal (Clasificar ave) */
+/* Botón principal (Realizar detección) */
 div.stButton > button:first-child {
-    background-color: #8b2b2b !important;
-    color: #ffffff !important;
+    background-color: #FCDD09 !important;
+    color: #6D090D !important;
     font-weight: 800 !important;
     font-size: 18px !important;
     border: 1.5px solid #5c1a1a !important;
@@ -309,6 +309,7 @@ if uploaded_file:
             st.dataframe(df_pred, use_container_width=True)
 else:
     st.info("👆 Sube una imagen para comenzar la detección.")
+
 
 
 
