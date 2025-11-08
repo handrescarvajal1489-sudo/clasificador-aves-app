@@ -57,18 +57,19 @@ h2, h3, h4, label, p, span, li {
     font-family: 'Segoe UI', sans-serif;
 }
 
-/* Botones rojos principales (Predicción, Clasificar, Imagen subida) */
+/* --- Botones vino tinto uniformes (Predicción, Imagen subida) --- */
 .btn-red {
     background-color: #8b2b2b;
     color: #ffffff !important;
-    padding: 10px 18px;
+    padding: 10px 20px;
     border-radius: 10px;
     display: inline-block;
-    font-weight: bold;
-    font-size: 18px;
-    box-shadow: 1px 1px 4px rgba(0,0,0,0.3);
+    font-weight: 800 !important;
+    font-size: 18px !important;
+    text-shadow: 0px 0px 3px rgba(0,0,0,0.4);
+    border: 1.5px solid #5c1a1a;
+    box-shadow: 1px 2px 5px rgba(0,0,0,0.4);
     margin-bottom: 10px;
-    border: none;
     text-align: center;
     transition: all 0.25s ease-in-out;
 }
@@ -76,6 +77,48 @@ h2, h3, h4, label, p, span, li {
     background-color: #6A0000;
     color: #FFD700 !important;
     transform: scale(1.05);
+}
+
+/* --- Botón principal de Streamlit (Clasificar ave) --- */
+div.stButton > button:first-child {
+    background-color: #8b2b2b !important;
+    color: #ffffff !important;
+    font-weight: 800 !important;
+    font-size: 18px !important;
+    border: 1.5px solid #5c1a1a !important;
+    border-radius: 10px !important;
+    padding: 10px 20px !important;
+    text-shadow: 0px 0px 3px rgba(0,0,0,0.4);
+    box-shadow: 1px 2px 5px rgba(0,0,0,0.4) !important;
+    transition: all 0.25s ease-in-out !important;
+}
+div.stButton > button:first-child:hover {
+    background-color: #6A0000 !important;
+    color: #FFD700 !important;
+    transform: scale(1.05);
+}
+
+/* --- Botón de carga (Browse files) --- */
+section[data-testid="stFileUploader"] button {
+    color: #ffffff !important;
+    font-weight: 800 !important;
+    border: 2px solid #5c1a1a !important;
+    background-color: #8b2b2b !important;
+    border-radius: 10px !important;
+    text-shadow: 0px 0px 3px rgba(0,0,0,0.4);
+    box-shadow: 1px 2px 5px rgba(0,0,0,0.4);
+    transition: all 0.3s ease-in-out;
+}
+section[data-testid="stFileUploader"] button:hover {
+    background-color: #6A0000 !important;
+    color: #FFD700 !important;
+    border-color: #FFD700 !important;
+}
+
+/* Texto del uploader */
+section[data-testid="stFileUploader"] * {
+    color: #ffffff !important;
+    font-weight: 600;
 }
 
 /* Caja resultado */
@@ -86,43 +129,6 @@ h2, h3, h4, label, p, span, li {
     padding: 1rem 1.2rem;
     margin-top: 1rem;
     color: #ffffff;
-}
-
-/* Botón del uploader (Browse files) - SIEMPRE LEGIBLE */
-section[data-testid="stFileUploader"] button {
-    color: #ffffff !important;
-    border: 2px solid #FFD700 !important;
-    background-color: #8b2b2b !important;
-    font-weight: 600 !important;
-    transition: all 0.3s ease-in-out !important;
-}
-section[data-testid="stFileUploader"] button:hover {
-    background-color: #6A0000 !important;
-    border-color: #FFD700 !important;
-    color: #FFD700 !important;
-}
-
-/* Texto del uploader */
-section[data-testid="stFileUploader"] * {
-    color: #ffffff !important;
-}
-
-/* Botón principal (Clasificar ave) igual al de Predicción */
-div.stButton > button:first-child {
-    background-color: #8b2b2b !important;
-    color: #ffffff !important;
-    border-radius: 10px !important;
-    font-size: 18px !important;
-    font-weight: bold !important;
-    border: none !important;
-    padding: 10px 20px !important;
-    box-shadow: 1px 1px 4px rgba(0,0,0,0.3) !important;
-    transition: all 0.25s ease-in-out !important;
-}
-div.stButton > button:first-child:hover {
-    background-color: #6A0000 !important;
-    color: #FFD700 !important;
-    transform: scale(1.05);
 }
 
 /* Marca de agua */
@@ -328,7 +334,6 @@ if uploaded_file:
             st.bar_chart(df_pred.set_index("Especie (modelo)"))
 else:
     st.info("👆 Sube una imagen para comenzar la clasificación.")
-
 
 
 
