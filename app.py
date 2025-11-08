@@ -15,53 +15,81 @@ st.set_page_config(
 )
 
 # ==========================
-# ESTILO PERSONALIZADO
+# ESTILO PERSONALIZADO (COLORES VINO TINTO + AMARILLO)
 # ==========================
 st.markdown("""
 <style>
-/* Fondo con degradado tipo selva tropical */
+/* Fondo general a dos franjas: vino tinto arriba, amarillo abajo */
 .stApp {
-    background: linear-gradient(180deg, #dff6f0 0%, #b5e7a0 50%, #a7d5f2 100%);
-    color: #1b3a4b;
+    background: linear-gradient(180deg, #6A0000 0%, #6A0000 45%, #FFD700 45%, #FFD700 100%);
 }
 
-/* Títulos */
+/* Contenedor principal como tarjeta para que se lea bien encima del fondo */
+.block-container {
+    background-color: rgba(0, 0, 0, 0.15);
+    padding: 2rem 2rem 3rem 2rem;
+    border-radius: 16px;
+    margin-top: 1rem;
+}
+
+/* Títulos en el contenido principal */
 h1, h2, h3, h4 {
-    color: #084c61;
-    text-align: center;
+    color: #FFFFFF;
     font-family: 'Segoe UI', sans-serif;
+}
+
+/* Sidebar más llamativa */
+[data-testid="stSidebar"] {
+    background-color: #11141f;
+    border-right: 3px solid #6A0000;
+}
+
+[data-testid="stSidebar"] h1,
+[data-testid="stSidebar"] h2,
+[data-testid="stSidebar"] h3 {
+    color: #FFD700;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* Texto del sidebar */
+[data-testid="stSidebar"] p,
+[data-testid="stSidebar"] li {
+    color: #f5f5f5;
+    font-size: 14px;
 }
 
 /* Botones */
 div.stButton > button:first-child {
-    background-color: #27ae60;
-    color: white;
+    background-color: #6A0000;
+    color: #FFD700;
     border: none;
     border-radius: 10px;
     font-size: 16px;
-    padding: 0.5em 1em;
-    transition: all 0.3s ease-in-out;
+    padding: 0.5em 1.1em;
+    font-weight: 600;
+    transition: all 0.2s ease-in-out;
 }
 div.stButton > button:first-child:hover {
-    background-color: #2ecc71;
-    transform: scale(1.05);
+    background-color: #8b0000;
+    color: #ffffff;
+    transform: scale(1.03);
 }
 
 /* Tablas */
 .dataframe {
+    background-color: #ffffff;
     border-radius: 10px;
-    background-color: #f8fbf8;
-    color: #1b3a4b;
-    font-size: 15px;
+    overflow: hidden;
 }
 
-/* Cuadro de resultado */
+/* Caja de resultado principal */
 .result-box {
-    background-color: rgba(255, 255, 255, 0.75);
-    border: 2px solid #2c7da0;
+    background-color: rgba(0, 0, 0, 0.45);
+    border: 2px solid #FFD700;
     border-radius: 15px;
-    padding: 1em;
-    margin-top: 1em;
+    padding: 1rem 1.2rem;
+    margin-top: 1rem;
+    color: #ffffff;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -69,21 +97,11 @@ div.stButton > button:first-child:hover {
 # ==========================
 # TÍTULO PRINCIPAL
 # ==========================
-st.title("🦜 Clasificador de Aves Tropicales")
+st.title("🦜 Clasificador de Aves")
 st.markdown(
-    "Sube una imagen y el modelo reconocerá la especie de ave. "
-    "Inspirado en la diversidad de aves de Latinoamérica. 🇨🇴"
+    "Sube una imagen de un ave y deja que el modelo de *Deep Learning* "
+    "prediga la especie."
 )
-
-# ==========================
-# DESCRIPCIONES DE AVES
-# ==========================
-BIRD_DESCRIPTIONS = {
-    "Coereba_flaveola": "Pequeña ave tropical conocida como pinchaflor o mielero, de pico curvado y plumaje amarillo intenso.",
-    "Icterus_nigrogularis": "El turpial, ave emblemática de vivos tonos naranjas y negros, con canto melodioso.",
-    "Oryzoborus_angolensis": "Semillero robusto de pico fuerte, común en zonas húmedas y con vegetación densa.",
-}
-DEFAULT_DESCRIPTION = "Descripción no disponible aún. Puedes agregar más especies en el código."
 
 # ==========================
 # SELECCIÓN DE MODELO
@@ -93,7 +111,7 @@ model_options = {
     "NASNetMobile": os.path.join("modelos", "dataset_nasnetmobile.keras"),
 }
 
-st.sidebar.header("⚙️ Configuración del modelo")
+st.sidebar.title("⚙️ Configuración del modelo")
 model_choice = st.sidebar.selectbox(
     "Selecciona el modelo a utilizar:",
     list(model_options.keys())
@@ -102,6 +120,7 @@ model_choice = st.sidebar.selectbox(
 MODEL_PATH = model_options[model_choice]
 CLASS_NAMES_PATH = "class_names.txt"
 
+# Tamaño de imagen según modelo
 if model_choice == "VGG16":
     IMG_SIZE = (224, 224)
 else:
@@ -144,61 +163,93 @@ def predict_image(model, img_array, class_names, top_k=3):
 try:
     model = load_model(MODEL_PATH)
     output_shape = model.output_shape
-    class_names = load_class_names(output_shape[-1])
+    num_classes = output_shape[-1]
+    class_names = load_class_names(num_classes)
+
     st.sidebar.success(f"Modelo '{model_choice}' cargado correctamente ✅")
+    st.sidebar.metric("Nº de clases", num_classes)
+    st.sidebar.metric("Modelo activo", model_choice)
+
+    # CONTEXTO DEL PROYECTO EN LA BARRA LATERAL
+    st.sidebar.markdown("### ℹ️ Sobre el proyecto")
+    st.sidebar.markdown(f"""
+Este proyecto implementa un **clasificador de aves** usando redes neuronales
+convolucionales (CNN).
+
+- 🧠 Arquitecturas: `VGG16` y `NASNetMobile`  
+- 🐦 Especies que puede reconocer: **{num_classes}**  
+- 🧪 Uso: práctica y demostración de modelos de **Deep Learning**.  
+- 🎓 Ideal para proyectos académicos, posters y presentaciones.
+""")
+
+    st.sidebar.markdown("### ✅ Consejos para mejores resultados")
+    st.sidebar.markdown("""
+- Procura que el ave esté **centrada** en la foto.  
+- Evita imágenes muy oscuras o borrosas.  
+- Prueba varias fotos de la misma especie y mira cómo cambia la probabilidad.  
+- Usa siempre formatos **JPG** o **PNG**.
+""")
+
 except Exception as e:
     st.error(f"Error al cargar modelo: {e}")
     st.stop()
 
 # ==========================
-# INTERFAZ
+# INTERFAZ PRINCIPAL
 # ==========================
-st.sidebar.header("📸 Instrucciones")
-st.sidebar.markdown("""
-1. Elige el modelo.  
-2. Sube una foto del ave.  
-3. Presiona **Clasificar ave**.  
-4. Verás la especie probable, su descripción y una tabla de resultados.
-""")
+st.subheader("📸 Sube tu imagen")
+uploaded_file = st.file_uploader(
+    "Sube una imagen de un ave (JPG o PNG)",
+    type=["jpg", "jpeg", "png"]
+)
 
-uploaded_file = st.file_uploader("Sube una imagen (JPG o PNG)", type=["jpg", "jpeg", "png"])
+st.markdown(
+    "Una vez cargues la imagen, pulsa **Clasificar ave** para ver las "
+    "3 especies más probables."
+)
 
 if uploaded_file:
     image = Image.open(uploaded_file)
     col1, col2 = st.columns([0.5, 0.5])
 
     with col1:
-        st.image(image, caption="📷 Imagen subida", use_container_width=True)
+        st.subheader("Imagen subida")
+        st.image(image, use_container_width=True)
 
     with col2:
-        st.subheader("🔎 Resultado de clasificación")
-        if st.button("🟢 Clasificar ave"):
+        st.subheader("Predicción")
+        if st.button("🔍 Clasificar ave"):
             with st.spinner("Analizando imagen..."):
                 img_array = preprocess_image(image)
                 results = predict_image(model, img_array, class_names, top_k=3)
 
-            top_pred = results[0]
-            name = top_pred["class_name"]
-            prob = top_pred["prob"] * 100
-            desc = BIRD_DESCRIPTIONS.get(name, DEFAULT_DESCRIPTION)
+            if results:
+                top_pred = results[0]
+                name = top_pred["class_name"]
+                prob = top_pred["prob"] * 100
 
-            st.markdown(f"""
-            <div class='result-box'>
-                <h3>🏆 Especie más probable</h3>
-                <h4 style='color:#05668d;'>{name}</h4>
-                <p><b>Confianza:</b> {prob:.2f}%</p>
-                <p><b>Descripción:</b> {desc}</p>
-            </div>
-            """, unsafe_allow_html=True)
+                # Caja destacada solo con especie + confianza
+                st.markdown(f"""
+                <div class='result-box'>
+                    <h3>🏆 Especie más probable</h3>
+                    <h2>{name}</h2>
+                    <p><b>Confianza:</b> {prob:.2f}%</p>
+                </div>
+                """, unsafe_allow_html=True)
 
-            df = pd.DataFrame({
-                "Especie": [r["class_name"] for r in results],
-                "Probabilidad (%)": [round(r["prob"]*100, 2) for r in results]
-            })
+                # Tabla + gráfica
+                df = pd.DataFrame({
+                    "Especie": [r["class_name"] for r in results],
+                    "Probabilidad (%)": [round(r["prob"]*100, 2) for r in results]
+                })
 
-            st.markdown("### 📊 Tabla de predicciones")
-            st.dataframe(df, use_container_width=True)
-            st.bar_chart(df.set_index("Especie"))
+                st.markdown("### 📊 Tabla de predicciones (Top 3)")
+                st.dataframe(df, use_container_width=True)
+
+                st.markdown("### 📈 Distribución de probabilidades")
+                st.bar_chart(df.set_index("Especie"))
+            else:
+                st.warning("No se obtuvieron predicciones, revisa la imagen.")
 else:
-    st.info("👆 Sube una imagen para comenzar.")
+    st.info("👆 Sube una imagen para comenzar la clasificación.")
 
