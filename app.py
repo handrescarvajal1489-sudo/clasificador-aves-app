@@ -1,5 +1,5 @@
 import os
-import unicodedata  # 👉 para normalizar textos
+import unicodedata
 import numpy as np
 import streamlit as st
 import tensorflow as tf
@@ -10,7 +10,7 @@ import pandas as pd
 # CONFIGURACIÓN GENERAL
 # ==========================
 st.set_page_config(
-    page_title="Clasificador de Aves 🦜",
+    page_title="Detector de Aves 🦜",
     page_icon="🦜",
     layout="wide",
 )
@@ -21,14 +21,14 @@ st.set_page_config(
 st.markdown(
     """
 <style>
-/* Fondo general amarillo intenso */
+/* Fondo general amarillo clásico */
 .stApp {
-    background-color: #ffeb3b; /* Amarillo dorado intenso */
+    background-color: #fff9c4;
 }
 
 /* Contenedor principal */
 .block-container {
-    background-color: rgba(255, 255, 255, 0.85);
+    background-color: rgba(255, 255, 255, 0.8);
     padding: 2rem 2rem 3rem 2rem;
     border-radius: 16px;
 }
@@ -54,7 +54,7 @@ st.markdown(
     transform: scale(1.05);
 }
 
-/* Títulos y textos */
+/* Textos */
 h1, h2, h3, h4, label, p, span, li {
     color: #111111;
     font-family: 'Segoe UI', sans-serif;
@@ -149,10 +149,6 @@ st.markdown(
 # FUNCIÓN DE NORMALIZACIÓN
 # ==========================
 def normalizar(texto: str) -> str:
-    """
-    Convierte el texto a minúsculas, sin tildes y sin espacios al inicio/fin.
-    Sirve para comparar nombres científicos de forma robusta.
-    """
     texto = texto.strip().lower()
     texto = unicodedata.normalize("NFD", texto)
     texto = "".join(c for c in texto if unicodedata.category(c) != "Mn")
@@ -188,20 +184,19 @@ species_table = {
     ],
     "Hábitat": [
         "Zonas andinas y subandinas.",
-        "Endémico: Bosques andinos y subandinos (Ibagué, Villahermosa).",
-        "Endémico: Bosques y bordes de bosque (Villa Hermosa, Tolima Central).",
+        "Bosques andinos y subandinos (Ibagué, Villahermosa).",
+        "Bosques y bordes de bosque (Tolima Central).",
         "Páramos y zonas altas (PNN Los Nevados, Murillo).",
-        "Especie en peligro. Bosques húmedos del Magdalena medio (Norte del Tolima).",
+        "Bosques húmedos del Magdalena medio (Norte del Tolima).",
         "Valle del río Magdalena, zonas bajas y cálidas.",
-        "Bosques de niebla, Andes Centrales (límites con Quindío).",
-        "Endémico: Bosques andinos y subandinos (El Líbano, Roncesvalles).",
+        "Bosques de niebla, Andes Centrales.",
+        "Bosques andinos y subandinos (El Líbano, Roncesvalles).",
         "Bosques de Palma de Cera (PNN Los Nevados).",
         "Zonas abiertas cerca de agua (Flandes, Espinal).",
     ],
 }
 df_species = pd.DataFrame(species_table)
 
-# Diccionario con clave normalizada (sin tildes, minúsculas)
 species_info = {
     normalizar(row["Especie científica"]): (row["Nombre común"], row["Hábitat"])
     for _, row in df_species.iterrows()
@@ -212,48 +207,27 @@ species_info = {
 # ==========================
 @st.cache_resource
 def load_model(model_path: str):
-    """Carga el modelo .keras desde la ruta indicada."""
     if not os.path.exists(model_path):
         raise FileNotFoundError(f"No se encontró el modelo: {model_path}")
-    try:
-        return tf.keras.models.load_model(
-            model_path,
-            compile=False,
-            safe_mode=False,
-        )
-    except TypeError:
-        return tf.keras.models.load_model(
-            model_path,
-            compile=False,
-        )
-
+    return tf.keras.models.load_model(model_path, compile=False)
 
 @st.cache_data
 def load_class_names(num_classes: int, path: str):
     if os.path.exists(path):
         with open(path, "r", encoding="utf-8") as f:
             names = [line.strip() for line in f if line.strip()]
-        if len(names) >= num_classes:
-            return names[:num_classes]
-        else:
-            names += [f"Clase {i}" for i in range(len(names), num_classes)]
-            return names
+        return names[:num_classes]
     return [f"Clase {i}" for i in range(num_classes)]
 
-
 def preprocess_image(img: Image.Image, size=(224, 224)):
-    """Convierte la imagen a RGB, la redimensiona y normaliza."""
     img = img.convert("RGB").resize(size)
     arr = np.array(img).astype("float32") / 255.0
     return np.expand_dims(arr, 0)
 
-
 def predict_image(model, img_array, class_names, top_k=3):
-    """Devuelve las top-k predicciones del modelo."""
     preds = model.predict(img_array, verbose=0)[0]
     indices = np.argsort(preds)[::-1][:top_k]
     return [{"class_name": class_names[i], "prob": float(preds[i])} for i in indices]
-
 
 # ==========================
 # CONFIGURACIÓN DE MODELOS
@@ -265,46 +239,14 @@ model_options = {
 CLASS_NAMES_PATH = "class_names.txt"
 
 st.sidebar.title("⚙ Configuración del modelo")
-model_choice = st.sidebar.selectbox(
-    "Selecciona el modelo a utilizar:",
-    list(model_options.keys()),
-)
-
+model_choice = st.sidebar.selectbox("Selecciona el modelo:", list(model_options.keys()))
 MODEL_PATH = model_options[model_choice]
 
 try:
     model = load_model(MODEL_PATH)
     num_classes = model.output_shape[-1]
     class_names = load_class_names(num_classes, CLASS_NAMES_PATH)
-
     st.sidebar.success(f"Modelo '{model_choice}' cargado correctamente ✅")
-    st.sidebar.metric("Nº de clases", num_classes)
-    st.sidebar.metric("Modelo activo", model_choice)
-
-    st.sidebar.markdown("### 🧠 Sobre el proyecto")
-    st.sidebar.markdown(
-        f"""
-Proyecto académico que implementa un *clasificador de aves colombianas* mediante *Deep Learning (CNN)*.
-
-- 🧬 Arquitecturas: VGG16 y NASNetMobile  
-- 🐦 Especies reconocibles: *{num_classes}*  
-- 🎓 Autor: Hollman Carvajal - Universidad Cooperativa  
-- 🧪 Enfoque: Procesamiento de imágenes y predicción visual.
-"""
-    )
-
-    st.sidebar.markdown("### 🪶 Consejos de uso")
-    st.sidebar.markdown(
-        """
-- Usa imágenes claras, con el ave centrada.  
-- Evita sombras o fondos muy oscuros.  
-- Formatos admitidos: *JPG / PNG*.  
-"""
-    )
-
-    st.sidebar.markdown("### 🐥 Especies clasificadas")
-    st.sidebar.dataframe(df_species, use_container_width=True)
-
 except Exception as e:
     st.error(f"Error al cargar el modelo: {e}")
     st.stop()
@@ -312,49 +254,39 @@ except Exception as e:
 # ==========================
 # INTERFAZ PRINCIPAL
 # ==========================
-st.markdown("<div class='title-button'>🦜 Clasificador de Aves</div>", unsafe_allow_html=True)
-st.markdown("Sube una imagen de un ave y deja que el modelo de Deep Learning prediga la especie.")
+st.markdown("<div class='title-button'>🦜 Detector de Aves</div>", unsafe_allow_html=True)
+st.markdown("Sube una imagen de un ave y deja que el modelo prediga su especie.")
 
 st.markdown("<div class='subtitle-button'>📸 Sube tu imagen</div>", unsafe_allow_html=True)
-uploaded_file = st.file_uploader(
-    "Sube una imagen de un ave (JPG o PNG)",
-    type=["jpg", "jpeg", "png"],
-)
+uploaded_file = st.file_uploader("Sube una imagen (JPG o PNG)", type=["jpg", "jpeg", "png"])
 
-st.markdown("Una vez cargues la imagen, pulsa *Clasificar ave* para ver las 3 especies más probables.")
-
-if uploaded_file is not None:
-    try:
-        image = Image.open(uploaded_file).convert("RGB")
-        img_display = np.array(image)
-    except Exception as e:
-        st.error(f"No se pudo abrir la imagen: {e}")
-        st.stop()
+if uploaded_file:
+    image = Image.open(uploaded_file).convert("RGB")
+    img_display = np.array(image)
 
     col1, col2 = st.columns([0.5, 0.5])
-
     with col1:
         st.markdown("<div class='subtitle-button'>📸 Imagen subida</div>", unsafe_allow_html=True)
         st.image(img_display, use_column_width=True)
 
     with col2:
-        st.markdown("<div class='subtitle-button'>🔍 Predicción</div>", unsafe_allow_html=True)
-
-        if st.button("🔍 Clasificar ave", key="predict_button"):
+        if st.button("🔍 Clasificar ave"):
             with st.spinner("Analizando imagen..."):
                 img_array = preprocess_image(image)
                 results = predict_image(model, img_array, class_names, top_k=3)
 
             top_pred = results[0]
-            # El modelo suele devolver algo tipo "Amazilia_cyaninfrons"
-            sci_name = top_pred["class_name"].replace("_", " ")
+            sci_name = top_pred["class_name"].replace("_", " ").strip()
             prob = top_pred["prob"] * 100
 
-            # Usamos la versión normalizada como clave
-            common_name, habitat = species_info.get(
-                normalizar(sci_name),
+            # búsqueda flexible por coincidencia parcial
+            normalized = normalizar(sci_name)
+            found = next(
+                ((v[0], v[1]) for k, v in species_info.items() if normalized in k or k in normalized),
                 ("Nombre común no disponible", "Hábitat no disponible."),
             )
+
+            common_name, habitat = found
 
             st.markdown(
                 f"""
@@ -369,20 +301,14 @@ if uploaded_file is not None:
                 unsafe_allow_html=True,
             )
 
-            df_pred = pd.DataFrame(
-                {
-                    "Especie (modelo)": [r["class_name"] for r in results],
-                    "Probabilidad (%)": [round(r["prob"] * 100, 2) for r in results],
-                }
-            )
-
-            st.markdown("### 📊 Tabla de predicciones (Top 3)")
+            df_pred = pd.DataFrame({
+                "Especie (modelo)": [r["class_name"] for r in results],
+                "Probabilidad (%)": [round(r["prob"] * 100, 2) for r in results],
+            })
+            st.markdown("### 📊 Tabla de predicciones")
             st.dataframe(df_pred, use_container_width=True)
-
-            st.markdown("### 📈 Distribución de probabilidades")
-            st.bar_chart(df_pred.set_index("Especie (modelo)"))
 else:
-    st.info("👆 Sube una imagen para comenzar la clasificación.")
+    st.info("👆 Sube una imagen para comenzar la detección.")
 
 
 
