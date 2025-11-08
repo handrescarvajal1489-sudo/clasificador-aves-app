@@ -1,4 +1,5 @@
 import os
+import unicodedata  # 👉 para normalizar textos
 import numpy as np
 import streamlit as st
 import tensorflow as tf
@@ -20,14 +21,14 @@ st.set_page_config(
 st.markdown(
     """
 <style>
-/* Fondo general amarillo */
+/* Fondo general amarillo intenso */
 .stApp {
-    background-color: #fff176; /* Amarillo claro en todo el fondo */
+    background-color: #ffeb3b; /* Amarillo dorado intenso */
 }
 
 /* Contenedor principal */
 .block-container {
-    background-color: rgba(255, 255, 255, 0.8);
+    background-color: rgba(255, 255, 255, 0.85);
     padding: 2rem 2rem 3rem 2rem;
     border-radius: 16px;
 }
@@ -114,7 +115,7 @@ section[data-testid="stFileUploader"] * {
 
 /* Caja resultado */
 .result-box {
-    background-color: rgba(139, 43, 43, 0.85);
+    background-color: rgba(139, 43, 43, 0.9);
     border: 2px solid #FFD700;
     border-radius: 15px;
     padding: 1rem 1.2rem;
@@ -143,6 +144,19 @@ st.markdown(
     "<div class='watermark'>Hollman Carvajal - Universidad Cooperativa</div>",
     unsafe_allow_html=True,
 )
+
+# ==========================
+# FUNCIÓN DE NORMALIZACIÓN
+# ==========================
+def normalizar(texto: str) -> str:
+    """
+    Convierte el texto a minúsculas, sin tildes y sin espacios al inicio/fin.
+    Sirve para comparar nombres científicos de forma robusta.
+    """
+    texto = texto.strip().lower()
+    texto = unicodedata.normalize("NFD", texto)
+    texto = "".join(c for c in texto if unicodedata.category(c) != "Mn")
+    return texto
 
 # ==========================
 # DATOS DE ESPECIES
@@ -186,8 +200,10 @@ species_table = {
     ],
 }
 df_species = pd.DataFrame(species_table)
+
+# Diccionario con clave normalizada (sin tildes, minúsculas)
 species_info = {
-    row["Especie científica"]: (row["Nombre común"], row["Hábitat"])
+    normalizar(row["Especie científica"]): (row["Nombre común"], row["Hábitat"])
     for _, row in df_species.iterrows()
 }
 
@@ -330,11 +346,14 @@ if uploaded_file is not None:
                 results = predict_image(model, img_array, class_names, top_k=3)
 
             top_pred = results[0]
+            # El modelo suele devolver algo tipo "Amazilia_cyaninfrons"
             sci_name = top_pred["class_name"].replace("_", " ")
             prob = top_pred["prob"] * 100
 
+            # Usamos la versión normalizada como clave
             common_name, habitat = species_info.get(
-                sci_name, ("Nombre común no disponible", "Hábitat no disponible.")
+                normalizar(sci_name),
+                ("Nombre común no disponible", "Hábitat no disponible."),
             )
 
             st.markdown(
@@ -364,7 +383,6 @@ if uploaded_file is not None:
             st.bar_chart(df_pred.set_index("Especie (modelo)"))
 else:
     st.info("👆 Sube una imagen para comenzar la clasificación.")
-
 
 
 
