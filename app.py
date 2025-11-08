@@ -33,14 +33,38 @@ st.markdown(
     border-radius: 16px;
 }
 
-/* Botones para títulos */
-.title-button, .subtitle-button {
+/* Botones de título */
+.title-button {
+    background-color: #FCDD09;
+    color: #6D090D !important;
+    padding: 20px 60px;                 /* 🔹 Más grande */
+    border-radius: 20px;
+    display: block;                     /* 🔹 Permite centrar */
+    margin: 30px auto;                  /* 🔹 Centrado horizontal */
+    font-weight: 900;
+    font-size: 28px;                    /* 🔹 Tamaño más grande */
+    text-align: center;                 /* 🔹 Texto centrado */
+    font-family: 'Segoe UI', sans-serif;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+    box-shadow: 2px 3px 10px rgba(0,0,0,0.5);
+    border: 3px solid #5c1a1a;
+    transition: all 0.3s ease-in-out;
+}
+.title-button:hover {
+    background-color: #6A0000;
+    color: #FFD700 !important;
+    transform: scale(1.05);
+}
+
+/* Subtítulo mantiene tamaño más pequeño */
+.subtitle-button {
     background-color: #FCDD09;
     color: #6D090D !important;
     padding: 10px 25px;
     border-radius: 12px;
     display: inline-block;
     font-weight: 800;
+    font-size: 18px;
     font-family: 'Segoe UI', sans-serif;
     text-shadow: 0px 0px 3px rgba(0,0,0,0.4);
     box-shadow: 1px 2px 5px rgba(0,0,0,0.4);
@@ -48,11 +72,12 @@ st.markdown(
     margin: 10px 0;
     transition: all 0.25s ease-in-out;
 }
-.title-button:hover, .subtitle-button:hover {
+.subtitle-button:hover {
     background-color: #6A0000;
     color: #FFD700 !important;
     transform: scale(1.05);
 }
+
 
 /* Textos generales */
 h1, h2, h3, h4, label, p, span, li {
@@ -365,6 +390,7 @@ if uploaded_file:
             st.bar_chart(df_pred.set_index("Especie (modelo)"))
 else:
     st.info("👆 Sube una imagen para comenzar la detección.")
+
 
 
 
