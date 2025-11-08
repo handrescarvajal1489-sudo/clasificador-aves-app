@@ -117,12 +117,21 @@ section[data-testid="stFileUploader"] * {
 
 /* Caja resultado */
 .result-box {
-    background-color: #FCDD09;
-    border: 2px solid #FFD700;
+    background-color: #6D090D;         /* fondo vino tinto */
+    border: 2px solid #FFD700;         /* borde dorado */
     border-radius: 15px;
     padding: 1rem 1.2rem;
     margin-top: 1rem;
-    color: #080700; /* texto vino tinto para mejor contraste */
+    color: #FCDD09;                    /* texto amarillo */
+}
+
+{
+.result-box h2, 
+.result-box h3, 
+.result-box p, 
+.result-box b, 
+.result-box i {
+    color: #FCDD09 !important;         /* todos los textos amarillos */
 }
 
 /* Marca de agua */
@@ -356,6 +365,7 @@ if uploaded_file:
             st.dataframe(df_pred, use_container_width=True)
 else:
     st.info("👆 Sube una imagen para comenzar la detección.")
+
 
 
 
