@@ -28,7 +28,7 @@ st.markdown(
 
 /* Contenedor principal */
 .block-container {
-    background-color: rgba(255, 255, 255, 0.8);
+    background-color: #dbc81f ;
     padding: 2rem 2rem 3rem 2rem;
     border-radius: 16px;
 }
@@ -309,6 +309,7 @@ if uploaded_file:
             st.dataframe(df_pred, use_container_width=True)
 else:
     st.info("👆 Sube una imagen para comenzar la detección.")
+
 
 
 
