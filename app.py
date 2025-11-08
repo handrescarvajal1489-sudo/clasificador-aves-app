@@ -57,10 +57,10 @@ h2, h3, h4, label, p, span, li {
     font-family: 'Segoe UI', sans-serif;
 }
 
-/* Botones principales (Clasificar, Predicción, Imagen subida) */
+/* Botones rojos principales (Predicción, Clasificar, Imagen subida) */
 .btn-red {
     background-color: #8b2b2b;
-    color: white !important;
+    color: #ffffff !important;
     padding: 10px 18px;
     border-radius: 10px;
     display: inline-block;
@@ -88,16 +88,16 @@ h2, h3, h4, label, p, span, li {
     color: #ffffff;
 }
 
-/* Botón del uploader (Browse files) */
+/* Botón del uploader (Browse files) - SIEMPRE LEGIBLE */
 section[data-testid="stFileUploader"] button {
     color: #ffffff !important;
-    border: 1.5px solid #FFD700 !important;
-    background-color: transparent !important;
-    transition: all 0.3s ease-in-out;
-    font-weight: 600;
+    border: 2px solid #FFD700 !important;
+    background-color: #8b2b2b !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease-in-out !important;
 }
 section[data-testid="stFileUploader"] button:hover {
-    background-color: #8b2b2b !important;
+    background-color: #6A0000 !important;
     border-color: #FFD700 !important;
     color: #FFD700 !important;
 }
@@ -105,6 +105,24 @@ section[data-testid="stFileUploader"] button:hover {
 /* Texto del uploader */
 section[data-testid="stFileUploader"] * {
     color: #ffffff !important;
+}
+
+/* Botón principal (Clasificar ave) igual al de Predicción */
+div.stButton > button:first-child {
+    background-color: #8b2b2b !important;
+    color: #ffffff !important;
+    border-radius: 10px !important;
+    font-size: 18px !important;
+    font-weight: bold !important;
+    border: none !important;
+    padding: 10px 20px !important;
+    box-shadow: 1px 1px 4px rgba(0,0,0,0.3) !important;
+    transition: all 0.25s ease-in-out !important;
+}
+div.stButton > button:first-child:hover {
+    background-color: #6A0000 !important;
+    color: #FFD700 !important;
+    transform: scale(1.05);
 }
 
 /* Marca de agua */
@@ -168,7 +186,6 @@ species_table = {
         "Zonas abiertas cerca de agua (Flandes, Espinal).",
     ],
 }
-
 df_species = pd.DataFrame(species_table)
 species_info = {
     row["Especie científica"]: (row["Nombre común"], row["Hábitat"])
@@ -311,13 +328,6 @@ if uploaded_file:
             st.bar_chart(df_pred.set_index("Especie (modelo)"))
 else:
     st.info("👆 Sube una imagen para comenzar la clasificación.")
-
-
-
-
-
-
-
 
 
 
