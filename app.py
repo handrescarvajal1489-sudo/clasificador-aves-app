@@ -36,7 +36,7 @@ st.markdown(
 /* Botones vino tinto para títulos */
 .title-button, .subtitle-button {
     background-color: #FCDD09 ;
-    color: #ffffff !important;
+    color:#120000 !important;
     padding: 10px 25px;
     border-radius: 12px;
     display: inline-block;
@@ -309,6 +309,7 @@ if uploaded_file:
             st.dataframe(df_pred, use_container_width=True)
 else:
     st.info("👆 Sube una imagen para comenzar la detección.")
+
 
 
 
