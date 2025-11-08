@@ -57,20 +57,21 @@ h2, h3, h4, label, p, span, li {
     font-family: 'Segoe UI', sans-serif;
 }
 
-/* Botones */
+/* Botones principales */
 div.stButton > button:first-child {
     background-color: #8b2b2b;
-    color: #ffffff;
+    color: #ffffff !important;
     border-radius: 10px;
     font-size: 16px;
     padding: 0.6em 1.3em;
     font-weight: 600;
     border: none;
     transition: all 0.2s ease-in-out;
+    box-shadow: 1px 1px 4px rgba(0,0,0,0.3);
 }
 div.stButton > button:first-child:hover {
     background-color: #6A0000;
-    color: #FFD700;
+    color: #FFD700 !important;
     transform: scale(1.03);
 }
 
@@ -84,12 +85,21 @@ div.stButton > button:first-child:hover {
     color: #ffffff;
 }
 
-/* Uploader: texto y botón blancos */
-section[data-testid="stFileUploader"] * {
-    color: #ffffff !important;
-}
+/* Botón del uploader (Browse files) */
 section[data-testid="stFileUploader"] button {
-    border-color: #ffffff;
+    color: #ffffff !important;
+    border: 1px solid #ffffff !important;
+    background-color: transparent !important;
+    transition: all 0.3s ease-in-out;
+}
+section[data-testid="stFileUploader"] button:hover {
+    background-color: #8b2b2b !important;
+    border-color: #FFD700 !important;
+    color: #FFD700 !important;
+}
+
+/* Texto del uploader */
+section[data-testid="stFileUploader"] * {
     color: #ffffff !important;
 }
 
@@ -154,7 +164,6 @@ species_table = {
         "Zonas abiertas cerca de agua (Flandes, Espinal).",
     ],
 }
-
 df_species = pd.DataFrame(species_table)
 species_info = {
     row["Especie científica"]: (row["Nombre común"], row["Hábitat"])
@@ -289,7 +298,30 @@ if uploaded_file:
         </div>
         """, unsafe_allow_html=True)
 
-        if st.button("🔍 Clasificar ave"):
+        # BOTÓN CLASIFICAR AVE - IGUAL ESTILO
+        st.markdown("""
+        <style>
+        .clasificar-btn {
+            background-color: #8b2b2b;
+            color: white;
+            border: none;
+            padding: 10px 22px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 10px;
+            box-shadow: 1px 1px 4px rgba(0,0,0,0.3);
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+        }
+        .clasificar-btn:hover {
+            background-color: #6A0000;
+            color: #FFD700;
+            transform: scale(1.03);
+        }
+        </style>
+        """, unsafe_allow_html=True)
+
+        if st.button("🔍 Clasificar ave", key="predict_button"):
             with st.spinner("Analizando imagen..."):
                 img_array = preprocess_image(image)
                 results = predict_image(model, img_array, class_names, top_k=3)
@@ -323,6 +355,7 @@ if uploaded_file:
             st.bar_chart(df_pred.set_index("Especie (modelo)"))
 else:
     st.info("👆 Sube una imagen para comenzar la clasificación.")
+
 
 
 
