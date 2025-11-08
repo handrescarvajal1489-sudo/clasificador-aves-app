@@ -73,7 +73,7 @@ h1, h2, h3, h4, label, p, span, li {
 /* Botón principal (Predecir especie) */
 div.stButton > button:first-child {
     background-color: #FCDD09 !important;
-    color: #000000 !important;                 /* 🔹 TEXTO NEGRO */
+    color: #6D090D !important;                
     font-weight: 800 !important;
     font-size: 18px !important;
     font-family: 'Segoe UI', sans-serif !important;
@@ -86,14 +86,14 @@ div.stButton > button:first-child {
     transition: all 0.25s ease-in-out !important;
 }
 div.stButton > button:first-child:hover {
-    background-color: #6D090D !important;
-    color: #FCDD09 !important;                 /* buen contraste en hover */
+    background-color: #FCDD0 !important;
+    color: #6D090D  !important;                 /* buen contraste en hover */
     transform: scale(1.05);
 }
 
 /* Botón de carga (Browse files) */
 section[data-testid="stFileUploader"] button {
-    color: #ffffff !important;
+    color: #FCDD09 !important;
     font-weight: 800 !important;
     border: 2px solid #5c1a1a !important;
     background-color: #8b2b2b !important;
@@ -365,6 +365,7 @@ if uploaded_file:
             st.bar_chart(df_pred.set_index("Especie (modelo)"))
 else:
     st.info("👆 Sube una imagen para comenzar la detección.")
+
 
 
 
