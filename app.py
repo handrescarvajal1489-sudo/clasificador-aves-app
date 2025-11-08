@@ -323,12 +323,22 @@ st.markdown(
 )
 
 if uploaded_file is not None:
-    # Intentar abrir la imagen de forma segura
+    # 1️⃣ Intentar abrir la imagen
     try:
         image = Image.open(uploaded_file)
         image = image.convert("RGB")
     except Exception as e:
-        st.error(f"No se pudo abrir la imagen. Asegúrate de que sea un archivo JPG o PNG válido. Detalle: {e}")
+        st.error(
+            f"No se pudo abrir la imagen. Asegúrate de que sea un archivo JPG o PNG válido.\n\nDetalle técnico: {e}"
+        )
+        st.stop()
+
+    # 2️⃣ Convertir a numpy para evitar problemas con PIL en st.image
+    try:
+        img_display = np.array(image)
+    except Exception as e:
+        st.error(f"No se pudo convertir la imagen a arreglo NumPy. Detalle: {e}")
+        st.write("Tipo de objeto image:", type(image))
         st.stop()
 
     col1, col2 = st.columns([0.5, 0.5])
@@ -337,7 +347,12 @@ if uploaded_file is not None:
         st.markdown(
             '<div class="btn-red">📸 Imagen subida</div>', unsafe_allow_html=True
         )
-        st.image(image, use_container_width=True)
+        try:
+            st.image(img_display, use_container_width=True)
+        except Exception as e:
+            st.error(f"No se pudo mostrar la imagen en la app. Detalle: {e}")
+            st.write("Shape del arreglo:", img_display.shape)
+            st.stop()
 
     with col2:
         st.markdown(
@@ -385,6 +400,8 @@ if uploaded_file is not None:
             st.bar_chart(df_pred.set_index("Especie (modelo)"))
 else:
     st.info("👆 Sube una imagen para comenzar la clasificación.")
+
+
 
 
 
