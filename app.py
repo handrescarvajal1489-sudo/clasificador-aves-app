@@ -94,27 +94,38 @@ h1, h2, h3, h4, label, p, span, li {
     color: #ffffff !important;
     font-family: 'Segoe UI', sans-serif;
 }
-
-/* Botón principal (Predecir especie) */
+/* Botón principal (Predecir especie) – igual a los botones amarillos */
 div.stButton > button:first-child {
-    background-color: #FCDD09 !important;
-    color: #6D090D !important;                
+    background-color: #FCDD09 !important;      /* amarillo */
+    color: #6D090D !important;                 /* texto vino tinto */
     font-weight: 800 !important;
     font-size: 18px !important;
     font-family: 'Segoe UI', sans-serif !important;
     border: 2px solid #5c1a1a !important;
     border-radius: 12px !important;
     padding: 10px 25px !important;
-    text-shadow: 0px 0px 3px rgba(0, 0, 0, 0.2);
-    box-shadow: 1px 2px 5px rgba(0, 0, 0, 0.4) !important;
+    text-shadow: 0px 0px 3px rgba(0,0,0,0.4);
+    box-shadow: 1px 2px 5px rgba(0,0,0,0.4) !important;  /* misma sombra */
     margin: 10px 0 !important;
     transition: all 0.25s ease-in-out !important;
 }
+
+/* Forzamos también el color del texto interno (span) */
+div.stButton > button:first-child span {
+    color: #6D090D !important;
+}
+
+/* Hover igual que "Carga la imagen" */
 div.stButton > button:first-child:hover {
-    background-color: #FCDD0 !important;
-    color: #6D090D  !important;                 /* buen contraste en hover */
+    background-color: #6A0000 !important;      /* vino tinto */
+    color: #FFD700 !important;                 /* texto dorado */
     transform: scale(1.05);
 }
+
+div.stButton > button:first-child:hover span {
+    color: #FFD700 !important;                 /* texto dorado en hover */
+}
+
 
 /* Botón de carga (Browse files) */
 section[data-testid="stFileUploader"] button {
@@ -390,6 +401,7 @@ if uploaded_file:
             st.bar_chart(df_pred.set_index("Especie (modelo)"))
 else:
     st.info("👆 Sube una imagen para comenzar la detección.")
+
 
 
 
