@@ -15,18 +15,24 @@ st.set_page_config(
 )
 
 # ==========================
-# ESTILO PERSONALIZADO (COLORES VINO TINTO + AMARILLO)
+# ESTILO PERSONALIZADO
 # ==========================
 st.markdown("""
 <style>
-/* Fondo general a dos franjas: vino tinto arriba, amarillo abajo */
+/* Fondo general: vino + amarillo pero más suave y claro */
 .stApp {
-    background: linear-gradient(180deg, #6A0000 0%, #6A0000 45%, #FFD700 45%, #FFD700 100%);
+    background: linear-gradient(
+        180deg,
+        #8b2b2b 0%,
+        #8b2b2b 40%,
+        #ffe766 40%,
+        #fff9c4 100%
+    );
 }
 
-/* Contenedor principal como tarjeta para que se lea bien encima del fondo */
+/* Contenedor principal más transparente */
 .block-container {
-    background-color: rgba(0, 0, 0, 0.15);
+    background-color: rgba(0, 0, 0, 0.04);
     padding: 2rem 2rem 3rem 2rem;
     border-radius: 16px;
     margin-top: 1rem;
@@ -34,14 +40,14 @@ st.markdown("""
 
 /* Títulos en el contenido principal */
 h1, h2, h3, h4 {
-    color: #FFFFFF;
+    color: #ffffff;
     font-family: 'Segoe UI', sans-serif;
 }
 
-/* Sidebar más llamativa */
+/* Sidebar más llamativa pero suave */
 [data-testid="stSidebar"] {
-    background-color: #11141f;
-    border-right: 3px solid #6A0000;
+    background-color: #181b26;
+    border-right: 2px solid #8b2b2b;
 }
 
 [data-testid="stSidebar"] h1,
@@ -60,7 +66,7 @@ h1, h2, h3, h4 {
 
 /* Botones */
 div.stButton > button:first-child {
-    background-color: #6A0000;
+    background-color: #8b2b2b;
     color: #FFD700;
     border: none;
     border-radius: 10px;
@@ -70,7 +76,7 @@ div.stButton > button:first-child {
     transition: all 0.2s ease-in-out;
 }
 div.stButton > button:first-child:hover {
-    background-color: #8b0000;
+    background-color: #6A0000;
     color: #ffffff;
     transform: scale(1.03);
 }
@@ -84,15 +90,34 @@ div.stButton > button:first-child:hover {
 
 /* Caja de resultado principal */
 .result-box {
-    background-color: rgba(0, 0, 0, 0.45);
+    background-color: rgba(0, 0, 0, 0.35);
     border: 2px solid #FFD700;
     border-radius: 15px;
     padding: 1rem 1.2rem;
     margin-top: 1rem;
     color: #ffffff;
 }
+
+/* Marca de agua con tu nombre y universidad */
+.watermark {
+    position: fixed;
+    right: 20px;
+    bottom: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.45);
+    z-index: 9999;
+    pointer-events: none;
+    font-family: 'Segoe UI', sans-serif;
+}
 </style>
 """, unsafe_allow_html=True)
+
+# Marca de agua
+st.markdown(
+    "<div class='watermark'>Hollman Carvajal - Universidad Cooperativa</div>",
+    unsafe_allow_html=True
+)
 
 # ==========================
 # TÍTULO PRINCIPAL
@@ -186,7 +211,7 @@ convolucionales (CNN).
     st.sidebar.markdown("""
 - Procura que el ave esté **centrada** en la foto.  
 - Evita imágenes muy oscuras o borrosas.  
-- Prueba varias fotos de la misma especie y mira cómo cambia la probabilidad.  
+- Prueba varias fotos de la misma especie y observa la estabilidad de la predicción.  
 - Usa siempre formatos **JPG** o **PNG**.
 """)
 
@@ -228,7 +253,6 @@ if uploaded_file:
                 name = top_pred["class_name"]
                 prob = top_pred["prob"] * 100
 
-                # Caja destacada solo con especie + confianza
                 st.markdown(f"""
                 <div class='result-box'>
                     <h3>🏆 Especie más probable</h3>
@@ -237,7 +261,6 @@ if uploaded_file:
                 </div>
                 """, unsafe_allow_html=True)
 
-                # Tabla + gráfica
                 df = pd.DataFrame({
                     "Especie": [r["class_name"] for r in results],
                     "Probabilidad (%)": [round(r["prob"]*100, 2) for r in results]
@@ -252,4 +275,6 @@ if uploaded_file:
                 st.warning("No se obtuvieron predicciones, revisa la imagen.")
 else:
     st.info("👆 Sube una imagen para comenzar la clasificación.")
+
+
 
