@@ -30,14 +30,14 @@ st.markdown("""
     );
 }
 
-/* Contenedor */
+/* Contenedor principal */
 .block-container {
     background-color: rgba(0, 0, 0, 0.03);
     padding: 2rem 2rem 3rem 2rem;
     border-radius: 16px;
 }
 
-/* Título principal */
+/* Títulos */
 h1 {
     color: #ffffff !important;
     font-family: 'Segoe UI', sans-serif;
@@ -57,7 +57,7 @@ h2, h3, h4, label, p, span, li {
     font-family: 'Segoe UI', sans-serif;
 }
 
-/* --- Botones vino tinto uniformes (Predicción, Imagen subida) --- */
+/* Botones vino tinto uniformes (Predicción, Imagen subida) */
 .btn-red {
     background-color: #8b2b2b;
     color: #ffffff !important;
@@ -79,7 +79,7 @@ h2, h3, h4, label, p, span, li {
     transform: scale(1.05);
 }
 
-/* --- Botón principal de Streamlit (Clasificar ave) --- */
+/* Botón principal (Clasificar ave) */
 div.stButton > button:first-child {
     background-color: #8b2b2b !important;
     color: #ffffff !important;
@@ -98,7 +98,7 @@ div.stButton > button:first-child:hover {
     transform: scale(1.05);
 }
 
-/* --- Botón de carga (Browse files) --- */
+/* Botón de carga (Browse files) */
 section[data-testid="stFileUploader"] button {
     color: #ffffff !important;
     font-weight: 800 !important;
@@ -108,6 +108,7 @@ section[data-testid="stFileUploader"] button {
     text-shadow: 0px 0px 3px rgba(0,0,0,0.4);
     box-shadow: 1px 2px 5px rgba(0,0,0,0.4);
     transition: all 0.3s ease-in-out;
+    font-size: 16px !important;
 }
 section[data-testid="stFileUploader"] button:hover {
     background-color: #6A0000 !important;
