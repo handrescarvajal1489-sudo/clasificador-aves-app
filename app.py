@@ -1,6 +1,4 @@
 import os
-import re
-import requests
 import numpy as np
 import streamlit as st
 import tensorflow as tf
@@ -59,7 +57,7 @@ h2, h3, h4, label, p, span, li {
     font-family: 'Segoe UI', sans-serif;
 }
 
-/* Botones vino tinto uniformes (títulos de columnas) */
+/* Botones vino tinto uniformes (Predicción, Imagen subida) */
 .btn-red {
     background-color: #8b2b2b;
     color: #ffffff !important;
@@ -205,7 +203,7 @@ species_info = {
 # FUNCIONES
 # ==========================
 @st.cache_resource
-def load_model(model_path: str):
+def load_model(model_path):
     if not os.path.exists(model_path):
         raise FileNotFoundError(f"No se encontró el modelo: {model_path}")
     return tf.keras.models.load_model(model_path)
@@ -232,95 +230,35 @@ def predict_image(model, img_array, class_names, top_k=3):
     indices = np.argsort(preds)[::-1][:top_k]
     return [{"class_name": class_names[i], "prob": float(preds[i])} for i in indices]
 
-@st.cache_resource
-def download_model_from_drive(url: str) -> str:
-    """
-    Descarga un archivo .keras desde un enlace de Google Drive y
-    lo guarda en la carpeta 'modelos/'. Devuelve la ruta local.
-    """
-    os.makedirs("modelos", exist_ok=True)
-
-    # Extraer ID de Google Drive si existe
-    match = re.search(r"/d/([a-zA-Z0-9_-]+)", url)
-    if match:
-        file_id = match.group(1)
-        download_url = f"https://drive.google.com/uc?export=download&id={file_id}"
-    else:
-        # Si ya es un enlace directo
-        download_url = url
-
-    local_path = os.path.join("modelos", "modelo_drive.keras")
-
-    # Si ya existe, reutilizar
-    if os.path.exists(local_path):
-        return local_path
-
-    resp = requests.get(download_url, stream=True)
-    resp.raise_for_status()
-
-    with open(local_path, "wb") as f:
-        for chunk in resp.iter_content(chunk_size=8192):
-            if chunk:
-                f.write(chunk)
-
-    return local_path
-
 # ==========================
-# SELECCIÓN DE MODELO DESDE GOOGLE DRIVE (SIDEBAR)
+# CONFIGURACIÓN DE MODELO
 # ==========================
-st.sidebar.title("⚙️ Configuración del modelo")
-
-st.sidebar.subheader("📂 Selecciona el modelo de Google Drive")
-
-model_links = {
-    "VGG16": "https://drive.google.com/file/d/1jgdXKThIFvjCTeRQ31jrElNCliWLzzfl/view?usp=drive_link",
-    "NASNetMobile": "https://drive.google.com/file/d/1NkBlxxUozvOzeFm9u2GqVxaUHjtTjhAv/view?usp=drive_link",
-    "Otro (pegar manualmente)": None,
+model_options = {
+    "VGG16": os.path.join("modelos", "vgg16_final.keras"),
+    "NASNetMobile": os.path.join("modelos", "dataset_nasnetmobile.keras"),
 }
+CLASS_NAMES_PATH = "class_names.txt"
 
-selected_model = st.sidebar.selectbox(
-    "Modelo a cargar:",
-    list(model_links.keys())
-)
+st.sidebar.title("⚙ Configuración del modelo")
+model_choice = st.sidebar.selectbox("Selecciona el modelo a utilizar:", list(model_options.keys()))
+MODEL_PATH = model_options[model_choice]
 
-if selected_model != "Otro (pegar manualmente)":
-    drive_url = model_links[selected_model]
-    st.sidebar.info(f"🔗 Usando modelo predefinido: **{selected_model}**")
-else:
-    drive_url = st.sidebar.text_input(
-        "📎 Pega el enlace de tu modelo (.keras) desde Google Drive:"
-    )
-
-if not drive_url:
-    st.error("❌ No hay enlace de modelo. Selecciona VGG16, NASNetMobile o pega un enlace de Google Drive.")
-    st.stop()
-
-# ==========================
-# DESCARGA Y CARGA DEL MODELO
-# ==========================
 try:
-    with st.spinner("⬇️ Descargando modelo desde Google Drive..."):
-        MODEL_PATH = download_model_from_drive(drive_url)
-
-    with st.spinner("🔄 Cargando modelo..."):
-        model = load_model(MODEL_PATH)
-
+    model = load_model(MODEL_PATH)
     num_classes = model.output_shape[-1]
-    CLASS_NAMES_PATH = "class_names.txt"
     class_names = load_class_names(num_classes, CLASS_NAMES_PATH)
 
-    st.sidebar.success("✅ Modelo cargado correctamente")
+    st.sidebar.success(f"Modelo '{model_choice}' cargado correctamente ✅")
     st.sidebar.metric("Nº de clases", num_classes)
-    st.sidebar.metric("Modelo activo", selected_model)
+    st.sidebar.metric("Modelo activo", model_choice)
 
     st.sidebar.markdown("### 🧠 Sobre el proyecto")
     st.sidebar.markdown(f"""
-Proyecto académico que implementa un **clasificador de aves colombianas**
-mediante **Deep Learning (CNN)**.
+Proyecto académico que implementa un *clasificador de aves colombianas* mediante *Deep Learning (CNN)*.
 
-- 🧬 Modelos: `VGG16`, `NASNetMobile`  
-- 🐦 Especies reconocibles: **{num_classes}**  
-- 🎓 Autor: *Hollman Carvajal - Universidad Cooperativa*  
+- 🧬 Arquitecturas: VGG16 y NASNetMobile  
+- 🐦 Especies reconocibles: *{num_classes}*  
+- 🎓 Autor: Hollman Carvajal - Universidad Cooperativa  
 - 🧪 Enfoque: Procesamiento de imágenes y predicción visual.
 """)
 
@@ -328,21 +266,21 @@ mediante **Deep Learning (CNN)**.
     st.sidebar.markdown("""
 - Usa imágenes claras, con el ave centrada.  
 - Evita sombras o fondos muy oscuros.  
-- Formatos admitidos: **JPG / PNG**.  
+- Formatos admitidos: *JPG / PNG*.  
 """)
 
     st.sidebar.markdown("### 🐥 Especies clasificadas")
     st.sidebar.dataframe(df_species, use_container_width=True)
 
 except Exception as e:
-    st.error(f"⚠️ Error al cargar el modelo: {e}")
+    st.error(f"Error al cargar el modelo: {e}")
     st.stop()
 
 # ==========================
 # INTERFAZ PRINCIPAL
 # ==========================
 st.title("🦜 Clasificador de Aves")
-st.markdown("Sube una imagen de un ave y deja que el modelo de *Deep Learning* prediga la especie.")
+st.markdown("Sube una imagen de un ave y deja que el modelo de Deep Learning prediga la especie.")
 
 st.subheader("📸 Sube tu imagen")
 uploaded_file = st.file_uploader(
@@ -350,7 +288,7 @@ uploaded_file = st.file_uploader(
     type=["jpg", "jpeg", "png"]
 )
 
-st.markdown("Una vez cargues la imagen, pulsa **Clasificar ave** para ver las 3 especies más probables.")
+st.markdown("Una vez cargues la imagen, pulsa *Clasificar ave* para ver las 3 especies más probables.")
 
 if uploaded_file:
     image = Image.open(uploaded_file)
@@ -397,6 +335,8 @@ if uploaded_file:
             st.bar_chart(df_pred.set_index("Especie (modelo)"))
 else:
     st.info("👆 Sube una imagen para comenzar la clasificación.")
+
+
 
 
 
