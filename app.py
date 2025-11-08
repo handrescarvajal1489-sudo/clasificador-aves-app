@@ -23,7 +23,7 @@ st.markdown(
 <style>
 /* Fondo general amarillo clásico */
 .stApp {
-    background-color: #dbc81f;
+    background-color: #fcdd09;
 }
 
 /* Contenedor principal */
@@ -309,6 +309,7 @@ if uploaded_file:
             st.dataframe(df_pred, use_container_width=True)
 else:
     st.info("👆 Sube una imagen para comenzar la detección.")
+
 
 
 
