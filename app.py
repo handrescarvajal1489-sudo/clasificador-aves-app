@@ -20,14 +20,14 @@ st.set_page_config(
 st.markdown(
     """
 <style>
-/* Fondo general amarillo */
+/* Fondo general amarillo intenso */
 .stApp {
-    background-color: #fff176; /* Amarillo claro en todo el fondo */
+    background-color: #ffeb3b; /* Amarillo dorado intenso */
 }
 
 /* Contenedor principal */
 .block-container {
-    background-color: rgba(255, 255, 255, 0.8);
+    background-color: rgba(255, 255, 255, 0.85);
     padding: 2rem 2rem 3rem 2rem;
     border-radius: 16px;
 }
@@ -114,7 +114,7 @@ section[data-testid="stFileUploader"] * {
 
 /* Caja resultado */
 .result-box {
-    background-color: rgba(139, 43, 43, 0.85);
+    background-color: rgba(139, 43, 43, 0.9);
     border: 2px solid #FFD700;
     border-radius: 15px;
     padding: 1rem 1.2rem;
@@ -364,5 +364,6 @@ if uploaded_file is not None:
             st.bar_chart(df_pred.set_index("Especie (modelo)"))
 else:
     st.info("👆 Sube una imagen para comenzar la clasificación.")
+
 
 
