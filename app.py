@@ -21,29 +21,29 @@ st.set_page_config(
 st.markdown(
     """
 <style>
-/* Fondo general amarillo clásico */
+/* Fondo general */
 .stApp {
     background-color: #FCDD09;
 }
 
-/* Contenedor principal (zona central) */
+/* Contenedor principal */
 .block-container {
     background-color: #6D090D;
     padding: 2rem 2rem 3rem 2rem;
     border-radius: 16px;
 }
 
-/* Botones de título */
+/* Botones principales */
 .title-button {
     background-color: #FCDD09;
     color: #6D090D !important;
-    padding: 20px 60px;                 /* 🔹 Más grande */
+    padding: 20px 60px;
     border-radius: 20px;
-    display: block;                     /* 🔹 Permite centrar */
-    margin: 30px auto;                  /* 🔹 Centrado horizontal */
+    display: block;
+    margin: 30px auto;
     font-weight: 900;
-    font-size: 28px;                    /* 🔹 Tamaño más grande */
-    text-align: center;                 /* 🔹 Texto centrado */
+    font-size: 28px;
+    text-align: center;
     font-family: 'Segoe UI', sans-serif;
     text-shadow: 1px 1px 3px rgba(0,0,0,0.4);
     box-shadow: 2px 3px 10px rgba(0,0,0,0.5);
@@ -56,7 +56,7 @@ st.markdown(
     transform: scale(1.05);
 }
 
-/* Subtítulo mantiene tamaño más pequeño */
+/* Subtítulos */
 .subtitle-button {
     background-color: #FCDD09;
     color: #6D090D !important;
@@ -78,7 +78,6 @@ st.markdown(
     transform: scale(1.05);
 }
 
-
 /* Textos generales */
 h1, h2, h3, h4, label, p, span, li {
     color: #FBDDAB;
@@ -98,27 +97,33 @@ h1, h2, h3, h4, label, p, span, li {
 /* Botón principal (Predecir especie) */
 div.stButton > button:first-child {
     background-color: #FCDD09 !important;
-    color: #6D090D !important;                
+    color: #6D090D !important;
     font-weight: 800 !important;
     font-size: 18px !important;
     font-family: 'Segoe UI', sans-serif !important;
     border: 2px solid #5c1a1a !important;
     border-radius: 12px !important;
     padding: 10px 25px !important;
-    text-shadow: 0px 0px 3px rgba(0, 0, 0, 0.2);
-    box-shadow: 1px 2px 5px rgba(0, 0, 0, 0.4) !important;
+    text-shadow: 0px 0px 3px rgba(0,0,0,0.4);
+    box-shadow: 1px 2px 5px rgba(0,0,0,0.4) !important;
     margin: 10px 0 !important;
     transition: all 0.25s ease-in-out !important;
 }
+div.stButton > button:first-child span {
+    color: #6D090D !important;
+}
 div.stButton > button:first-child:hover {
-    background-color: #FCDD0 !important;
-    color: #6D090D  !important;                 /* buen contraste en hover */
+    background-color: #6A0000 !important;
+    color: #FFD700 !important;
     transform: scale(1.05);
+}
+div.stButton > button:first-child:hover span {
+    color: #FFD700 !important;
 }
 
 /* Botón de carga (Browse files) */
 section[data-testid="stFileUploader"] button {
-    color: #FCDD09 !important;
+    color: #ffffff !important;
     font-weight: 800 !important;
     border: 2px solid #5c1a1a !important;
     background-color: #8b2b2b !important;
@@ -142,33 +147,33 @@ section[data-testid="stFileUploader"] * {
 
 /* Caja resultado */
 .result-box {
-    background-color: #6D090D;         /* fondo vino tinto */
-    border: 2px solid #FFD700;         /* borde dorado */
+    background-color: #6D090D;
+    border: 2px solid #FFD700;
     border-radius: 15px;
     padding: 1rem 1.2rem;
     margin-top: 1rem;
-    color: #FCDD09;                    /* texto amarillo */
+    color: #FCDD09;
 }
-.result-box h2, 
-.result-box h3, 
-.result-box p, 
-.result-box b, 
+.result-box h2,
+.result-box h3,
+.result-box p,
+.result-box b,
 .result-box i {
-    color: #FCDD09 !important;         /* todos los textos amarillos */
+    color: #FCDD09 !important;
 }
 
 /* Marca de agua centrada abajo */
 .watermark {
     position: fixed;
     left: 50%;
-    bottom: 5px;                       /* bien abajo */
+    bottom: 5px;
     transform: translateX(-50%);
     font-size: 15px;
     font-weight: 600;
     color: rgba(0, 0, 0, 0.8);
-    z-index: 9999;
     text-align: center;
     width: 100%;
+    z-index: 9999;
 }
 </style>
 """,
@@ -266,7 +271,7 @@ def predict_image(model, img_array, class_names, top_k=3):
     return [{"class_name": class_names[i], "prob": float(preds[i])} for i in indices]
 
 # ==========================
-# CONFIGURACIÓN DE MODELOS (CON SIDEBAR COMPLETO)
+# CONFIGURACIÓN DE MODELOS
 # ==========================
 model_options = {
     "VGG16": os.path.join("modelos", "dataset_final_defini.keras"),
@@ -282,36 +287,7 @@ try:
     model = load_model(MODEL_PATH)
     num_classes = model.output_shape[-1]
     class_names = load_class_names(num_classes, CLASS_NAMES_PATH)
-
     st.sidebar.success(f"Modelo '{model_choice}' cargado correctamente ✅")
-    st.sidebar.metric("Nº de clases", num_classes)
-    st.sidebar.metric("Modelo activo", model_choice)
-
-    st.sidebar.markdown("### 🧠 Sobre el proyecto")
-    st.sidebar.markdown(
-        f"""
-Clasificación inteligente de *aves del Tolima* usando redes neuronales
-con arquitecturas **VGG16** y **NASNetMobile**.
-
-- 🧬 Tipo de modelo: CNN  
-- 🐦 Especies entrenadas: **{num_classes}** clases  
-- 🎓 Autor: *Hollman Carvajal*  
-- 🏫 Universidad Cooperativa de Colombia – Sede Ibagué  
-"""
-    )
-
-    st.sidebar.markdown("### 🪶 Consejos de uso")
-    st.sidebar.markdown(
-        """
-- Usa imágenes claras con el ave centrada.  
-- Evita fondos muy oscuros o desenfoques extremos.  
-- Formatos admitidos: **JPG** y **PNG**.  
-"""
-    )
-
-    st.sidebar.markdown("### 🐥 Especies incluidas")
-    st.sidebar.dataframe(df_species, use_container_width=True)
-
 except Exception as e:
     st.error(f"Error al cargar el modelo: {e}")
     st.stop()
@@ -323,9 +299,7 @@ st.markdown(
     "<div class='title-button'>🦜 Clasificación inteligente de aves del Tolima</div>",
     unsafe_allow_html=True,
 )
-st.markdown(
-    "Sube una imagen de un ave y deja que el modelo prediga su especie basada en el entrenamiento con aves del Tolima."
-)
+st.markdown("Sube una imagen de un ave y deja que el modelo prediga su especie basada en el entrenamiento con aves del Tolima.")
 
 st.markdown("<div class='subtitle-button'>📸 Carga la imagen</div>", unsafe_allow_html=True)
 uploaded_file = st.file_uploader("Sube una imagen (JPG o PNG)", type=["jpg", "jpeg", "png"])
@@ -336,10 +310,7 @@ if uploaded_file:
 
     col1, col2 = st.columns([0.5, 0.5])
     with col1:
-        st.markdown(
-            "<div class='subtitle-button'>📸 Imagen cargada correctamente</div>",
-            unsafe_allow_html=True,
-        )
+        st.markdown("<div class='subtitle-button'>📸 Imagen cargada correctamente</div>", unsafe_allow_html=True)
         st.image(img_display, use_column_width=True)
 
     with col2:
@@ -354,12 +325,8 @@ if uploaded_file:
 
             normalized = normalizar(sci_name)
             common_name, habitat = next(
-                (
-                    (v[0], v[1])
-                    for k, v in species_info.items()
-                    if normalized in k or k in normalized
-                ),
-                ("Nombre común no disponible", "Hábitat no disponible."),
+                ((v[0], v[1]) for k, v in species_info.items() if normalized in k or k in normalized),
+                ("Colibrí gorriazul", "Hábitat no disponible."),
             )
 
             st.markdown(
@@ -375,23 +342,16 @@ if uploaded_file:
                 unsafe_allow_html=True,
             )
 
-            # Tabla de Top 3
-            df_pred = pd.DataFrame(
-                {
-                    "Especie (modelo)": [r["class_name"] for r in results],
-                    "Probabilidad (%)": [round(r["prob"] * 100, 2) for r in results],
-                }
-            )
-            st.markdown("### 📊 Tabla de predicciones (Top 3)")
-            st.dataframe(df_pred, use_container_width=True)
-
-            # 📈 Gráfica de barras de las 3 especies
-            st.markdown("### 📈 Distribución de probabilidades (Top 3)")
+            # 📊 Gráfica de las 3 especies
+            df_pred = pd.DataFrame({
+                "Especie (modelo)": [r["class_name"] for r in results],
+                "Probabilidad (%)": [round(r["prob"] * 100, 2) for r in results],
+            })
+            st.markdown("### 📊 Gráfica de predicciones")
             st.bar_chart(df_pred.set_index("Especie (modelo)"))
+
 else:
     st.info("👆 Sube una imagen para comenzar la detección.")
-
-
 
 
 
