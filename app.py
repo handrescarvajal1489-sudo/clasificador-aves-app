@@ -134,19 +134,18 @@ section[data-testid="stFileUploader"] * {
     color: #FCDD09 !important;         /* todos los textos amarillos */
 }
 
-/* Marca de agua centrada abajo */
+/* Marca de agua */
 .watermark {
     position: fixed;
     left: 50%;
-    bottom: 5px;                  /* más abajo */
+    bottom: 20px;
     transform: translateX(-50%);
     font-size: 15px;
     font-weight: 600;
     color: rgba(0, 0, 0, 0.8);
     z-index: 9999;
-    text-align: center;
-    width: 100%;
 }
+
 
 </style>
 """,
@@ -368,6 +367,7 @@ if uploaded_file:
             st.dataframe(df_pred, use_container_width=True)
 else:
     st.info("👆 Sube una imagen para comenzar la detección.")
+
 
 
 
