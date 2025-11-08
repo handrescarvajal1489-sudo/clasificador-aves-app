@@ -19,35 +19,35 @@ st.set_page_config(
 # ==========================
 st.markdown("""
 <style>
-/* Fondo general: vino + amarillo pero más suave y claro */
+/* Fondo vino tinto + amarillo más suave */
 .stApp {
     background: linear-gradient(
         180deg,
         #8b2b2b 0%,
-        #8b2b2b 40%,
-        #ffe766 40%,
-        #fff9c4 100%
+        #8b2b2b 35%,
+        #fff176 35%,
+        #fffde7 100%
     );
 }
 
-/* Contenedor principal más transparente */
+/* Contenedor principal transparente */
 .block-container {
-    background-color: rgba(0, 0, 0, 0.04);
+    background-color: rgba(0, 0, 0, 0.03);
     padding: 2rem 2rem 3rem 2rem;
     border-radius: 16px;
     margin-top: 1rem;
 }
 
-/* Títulos en el contenido principal */
+/* Títulos */
 h1, h2, h3, h4 {
     color: #ffffff;
     font-family: 'Segoe UI', sans-serif;
 }
 
-/* Sidebar más llamativa pero suave */
+/* Sidebar */
 [data-testid="stSidebar"] {
-    background-color: #181b26;
-    border-right: 2px solid #8b2b2b;
+    background-color: #161921;
+    border-right: 3px solid #8b2b2b;
 }
 
 [data-testid="stSidebar"] h1,
@@ -57,7 +57,6 @@ h1, h2, h3, h4 {
     font-family: 'Segoe UI', sans-serif;
 }
 
-/* Texto del sidebar */
 [data-testid="stSidebar"] p,
 [data-testid="stSidebar"] li {
     color: #f5f5f5;
@@ -81,14 +80,7 @@ div.stButton > button:first-child:hover {
     transform: scale(1.03);
 }
 
-/* Tablas */
-.dataframe {
-    background-color: #ffffff;
-    border-radius: 10px;
-    overflow: hidden;
-}
-
-/* Caja de resultado principal */
+/* Caja resultado */
 .result-box {
     background-color: rgba(0, 0, 0, 0.35);
     border: 2px solid #FFD700;
@@ -98,22 +90,24 @@ div.stButton > button:first-child:hover {
     color: #ffffff;
 }
 
-/* Marca de agua con tu nombre y universidad */
+/* Marca de agua centrada */
 .watermark {
     position: fixed;
-    right: 20px;
-    bottom: 10px;
-    font-size: 13px;
-    font-weight: 500;
-    color: rgba(255, 255, 255, 0.45);
+    left: 50%;
+    bottom: 20px;
+    transform: translateX(-50%);
+    font-size: 15px;
+    font-weight: 600;
+    color: rgba(0, 0, 0, 0.4);
     z-index: 9999;
     pointer-events: none;
     font-family: 'Segoe UI', sans-serif;
+    letter-spacing: 0.5px;
 }
 </style>
 """, unsafe_allow_html=True)
 
-# Marca de agua
+# Marca de agua centrada
 st.markdown(
     "<div class='watermark'>Hollman Carvajal - Universidad Cooperativa</div>",
     unsafe_allow_html=True
@@ -125,7 +119,7 @@ st.markdown(
 st.title("🦜 Clasificador de Aves")
 st.markdown(
     "Sube una imagen de un ave y deja que el modelo de *Deep Learning* "
-    "prediga la especie."
+    "prediga la especie con base en redes convolucionales (CNN)."
 )
 
 # ==========================
@@ -145,11 +139,8 @@ model_choice = st.sidebar.selectbox(
 MODEL_PATH = model_options[model_choice]
 CLASS_NAMES_PATH = "class_names.txt"
 
-# Tamaño de imagen según modelo
-if model_choice == "VGG16":
-    IMG_SIZE = (224, 224)
-else:
-    IMG_SIZE = (224, 224)
+# Tamaño de imagen
+IMG_SIZE = (224, 224)
 
 # ==========================
 # FUNCIONES AUXILIARES
@@ -195,25 +186,54 @@ try:
     st.sidebar.metric("Nº de clases", num_classes)
     st.sidebar.metric("Modelo activo", model_choice)
 
-    # CONTEXTO DEL PROYECTO EN LA BARRA LATERAL
+    # CONTEXTO DEL PROYECTO
     st.sidebar.markdown("### ℹ️ Sobre el proyecto")
     st.sidebar.markdown(f"""
-Este proyecto implementa un **clasificador de aves** usando redes neuronales
-convolucionales (CNN).
+Proyecto académico desarrollado como demostración de un sistema de **clasificación de aves colombianas**
+mediante modelos de **Deep Learning (CNN)**.
 
-- 🧠 Arquitecturas: `VGG16` y `NASNetMobile`  
-- 🐦 Especies que puede reconocer: **{num_classes}**  
-- 🧪 Uso: práctica y demostración de modelos de **Deep Learning**.  
-- 🎓 Ideal para proyectos académicos, posters y presentaciones.
+- 🧠 Arquitecturas: `VGG16` y `NASNetMobile`
+- 🐦 Especies reconocibles: **{num_classes}**
+- 🎓 Autor: *Hollman Carvajal - Universidad Cooperativa*
+- 🧪 Enfoque: Procesamiento de imágenes y predicción visual.
 """)
 
-    st.sidebar.markdown("### ✅ Consejos para mejores resultados")
+    st.sidebar.markdown("### ✅ Consejos de uso")
     st.sidebar.markdown("""
-- Procura que el ave esté **centrada** en la foto.  
-- Evita imágenes muy oscuras o borrosas.  
-- Prueba varias fotos de la misma especie y observa la estabilidad de la predicción.  
-- Usa siempre formatos **JPG** o **PNG**.
+- Usa imágenes claras, con el ave centrada.  
+- Formatos admitidos: **JPG** y **PNG**.  
+- Ideal para análisis visual o presentaciones científicas.
 """)
+
+    # ==========================
+    # TABLA DE ESPECIES EN EL LATERAL
+    # ==========================
+    st.sidebar.markdown("### 🐥 Especies clasificadas")
+
+    data = {
+        "Especie científica": [
+            "Amazilia cyaninfrons", "Anthocephala berlepschi", "Atlapetes flaviceps",
+            "Bolborhynchus ferrugineifrons", "Crax alberti", "Euphonia concinna",
+            "Hapalopsittaca fuertesi", "Leptotila conoveri", "Ognorhynchus icterotis",
+            "Pyrocephalus rubinus"
+        ],
+        "Nombre común": [
+            "Colibrí Gorriiazul", "Colibrí Cabecicastaño Andino", "Pinzón Cabeciamarillo",
+            "Periquito de los Nevados", "Paujil Colombiano", "Eufonia del Magdalena",
+            "Loro Coroniazul", "Paloma Montaraz de Tolima", "Loro Orejiamarillo",
+            "Atrapamoscas Pechirrojo"
+        ],
+        "Hábitat": [
+            "Zonas andinas y subandinas", "Bosques andinos (Ibagué, Villahermosa)",
+            "Bordes de bosque (Tolima Central)", "Páramos (PNN Los Nevados, Murillo)",
+            "Bosques húmedos del Magdalena medio", "Valle del río Magdalena",
+            "Bosques de niebla (Andes Centrales)", "Bosques andinos (El Líbano, Roncesvalles)",
+            "Bosques de Palma de Cera (PNN Los Nevados)", "Zonas abiertas cerca de agua"
+        ]
+    }
+
+    df_species = pd.DataFrame(data)
+    st.sidebar.dataframe(df_species, use_container_width=True)
 
 except Exception as e:
     st.error(f"Error al cargar modelo: {e}")
@@ -228,10 +248,7 @@ uploaded_file = st.file_uploader(
     type=["jpg", "jpeg", "png"]
 )
 
-st.markdown(
-    "Una vez cargues la imagen, pulsa **Clasificar ave** para ver las "
-    "3 especies más probables."
-)
+st.markdown("Una vez cargues la imagen, pulsa **Clasificar ave** para ver las 3 especies más probables.")
 
 if uploaded_file:
     image = Image.open(uploaded_file)
@@ -275,6 +292,8 @@ if uploaded_file:
                 st.warning("No se obtuvieron predicciones, revisa la imagen.")
 else:
     st.info("👆 Sube una imagen para comenzar la clasificación.")
+
+
 
 
 
