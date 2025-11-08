@@ -30,26 +30,24 @@ st.markdown("""
     );
 }
 
-/* Contenedor principal */
+/* Contenedor */
 .block-container {
     background-color: rgba(0, 0, 0, 0.03);
     padding: 2rem 2rem 3rem 2rem;
     border-radius: 16px;
 }
 
-/* Título principal en blanco */
+/* Título principal */
 h1 {
     color: #ffffff !important;
     font-family: 'Segoe UI', sans-serif;
 }
-
-/* Resto de textos en el cuerpo (negro) */
 h2, h3, h4, label, p, span, li {
     color: #111111;
     font-family: 'Segoe UI', sans-serif;
 }
 
-/* === SIDEBAR: todo en blanco === */
+/* Sidebar */
 [data-testid="stSidebar"] {
     background-color: #161921;
     border-right: 3px solid #8b2b2b;
@@ -62,15 +60,18 @@ h2, h3, h4, label, p, span, li {
 /* Botones */
 div.stButton > button:first-child {
     background-color: #8b2b2b;
-    color: #FFD700;
+    color: #ffffff;
     border-radius: 10px;
     font-size: 16px;
-    padding: 0.5em 1.1em;
+    padding: 0.6em 1.3em;
     font-weight: 600;
+    border: none;
+    transition: all 0.2s ease-in-out;
 }
 div.stButton > button:first-child:hover {
     background-color: #6A0000;
-    color: #ffffff;
+    color: #FFD700;
+    transform: scale(1.03);
 }
 
 /* Caja resultado */
@@ -83,12 +84,13 @@ div.stButton > button:first-child:hover {
     color: #ffffff;
 }
 
-/* === Uploader: texto y botón en blanco === */
+/* Uploader: texto y botón blancos */
 section[data-testid="stFileUploader"] * {
     color: #ffffff !important;
 }
 section[data-testid="stFileUploader"] button {
     border-color: #ffffff;
+    color: #ffffff !important;
 }
 
 /* Marca de agua */
@@ -112,7 +114,7 @@ st.markdown(
 )
 
 # ==========================
-# DATOS DE ESPECIES (TABLA + DESCRIPCIÓN)
+# DATOS DE ESPECIES
 # ==========================
 species_table = {
     "Especie científica": [
@@ -154,8 +156,6 @@ species_table = {
 }
 
 df_species = pd.DataFrame(species_table)
-
-# Diccionario para descripción al predecir
 species_info = {
     row["Especie científica"]: (row["Nombre común"], row["Hábitat"])
     for _, row in df_species.iterrows()
@@ -214,7 +214,6 @@ try:
     st.sidebar.metric("Nº de clases", num_classes)
     st.sidebar.metric("Modelo activo", model_choice)
 
-    # Sobre el proyecto
     st.sidebar.markdown("### 🧠 Sobre el proyecto")
     st.sidebar.markdown(f"""
 Proyecto académico que implementa un **clasificador de aves colombianas** mediante **Deep Learning (CNN)**.
@@ -225,7 +224,6 @@ Proyecto académico que implementa un **clasificador de aves colombianas** media
 - 🧪 Enfoque: Procesamiento de imágenes y predicción visual.
 """)
 
-    # Consejos de uso
     st.sidebar.markdown("### 🪶 Consejos de uso")
     st.sidebar.markdown("""
 - Usa imágenes claras, con el ave centrada.  
@@ -233,7 +231,6 @@ Proyecto académico que implementa un **clasificador de aves colombianas** media
 - Formatos admitidos: **JPG / PNG**.  
 """)
 
-    # Tabla lateral de especies
     st.sidebar.markdown("### 🐥 Especies clasificadas")
     st.sidebar.dataframe(df_species, use_container_width=True)
 
@@ -260,23 +257,46 @@ if uploaded_file:
     col1, col2 = st.columns([0.5, 0.5])
 
     with col1:
-        st.subheader("📷 Imagen subida")
+        st.markdown("""
+        <div style="
+            background-color: #8b2b2b;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 10px;
+            display: inline-block;
+            font-weight: bold;
+            font-size: 18px;
+            box-shadow: 1px 1px 4px rgba(0,0,0,0.3);
+            margin-bottom: 10px;">
+            📸 Imagen subida
+        </div>
+        """, unsafe_allow_html=True)
         st.image(image, use_container_width=True)
 
     with col2:
-        st.subheader("🔎 Predicción")
+        st.markdown("""
+        <div style="
+            background-color: #8b2b2b;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 10px;
+            display: inline-block;
+            font-weight: bold;
+            font-size: 18px;
+            box-shadow: 1px 1px 4px rgba(0,0,0,0.3);
+            margin-bottom: 10px;">
+            🔍 Predicción
+        </div>
+        """, unsafe_allow_html=True)
+
         if st.button("🔍 Clasificar ave"):
             with st.spinner("Analizando imagen..."):
                 img_array = preprocess_image(image)
                 results = predict_image(model, img_array, class_names, top_k=3)
 
-            # Top 1
             top_pred = results[0]
-            raw_name = top_pred["class_name"]
+            sci_name = top_pred["class_name"].replace("_", " ")
             prob = top_pred["prob"] * 100
-
-            # Normalizar nombre (por si viene con guiones bajos)
-            sci_name = raw_name.replace("_", " ")
 
             common_name, habitat = species_info.get(
                 sci_name,
@@ -293,19 +313,17 @@ if uploaded_file:
             </div>
             """, unsafe_allow_html=True)
 
-            # Tabla de resultados
             df_pred = pd.DataFrame({
                 "Especie (modelo)": [r["class_name"] for r in results],
                 "Probabilidad (%)": [round(r["prob"] * 100, 2) for r in results],
             })
-
             st.markdown("### 📊 Tabla de predicciones (Top 3)")
             st.dataframe(df_pred, use_container_width=True)
-
             st.markdown("### 📈 Distribución de probabilidades")
             st.bar_chart(df_pred.set_index("Especie (modelo)"))
 else:
     st.info("👆 Sube una imagen para comenzar la clasificación.")
+
 
 
 
