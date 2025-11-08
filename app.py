@@ -20,30 +20,41 @@ st.set_page_config(
 st.markdown(
     """
 <style>
-/* Fondo general */
+/* Fondo general amarillo */
 .stApp {
-    background: linear-gradient(
-        180deg,
-        #8b2b2b 0%,
-        #8b2b2b 35%,
-        #fff176 35%,
-        #fffde7 100%
-    );
+    background-color: #fff176; /* Amarillo claro en todo el fondo */
 }
 
 /* Contenedor principal */
 .block-container {
-    background-color: rgba(0, 0, 0, 0.03);
+    background-color: rgba(255, 255, 255, 0.8);
     padding: 2rem 2rem 3rem 2rem;
     border-radius: 16px;
 }
 
-/* Títulos */
-h1 {
+/* Botones vino tinto para títulos */
+.title-button, .subtitle-button {
+    background-color: #8b2b2b;
     color: #ffffff !important;
+    padding: 10px 25px;
+    border-radius: 12px;
+    display: inline-block;
+    font-weight: 800;
     font-family: 'Segoe UI', sans-serif;
+    text-shadow: 0px 0px 3px rgba(0,0,0,0.4);
+    box-shadow: 1px 2px 5px rgba(0,0,0,0.4);
+    border: 2px solid #5c1a1a;
+    margin: 10px 0;
+    transition: all 0.25s ease-in-out;
 }
-h2, h3, h4, label, p, span, li {
+.title-button:hover, .subtitle-button:hover {
+    background-color: #6A0000;
+    color: #FFD700 !important;
+    transform: scale(1.05);
+}
+
+/* Títulos y textos */
+h1, h2, h3, h4, label, p, span, li {
     color: #111111;
     font-family: 'Segoe UI', sans-serif;
 }
@@ -56,28 +67,6 @@ h2, h3, h4, label, p, span, li {
 [data-testid="stSidebar"] * {
     color: #ffffff !important;
     font-family: 'Segoe UI', sans-serif;
-}
-
-/* Botones vino tinto uniformes (Predicción, Imagen subida) */
-.btn-red {
-    background-color: #8b2b2b;
-    color: #ffffff !important;
-    padding: 10px 20px;
-    border-radius: 10px;
-    display: inline-block;
-    font-weight: 800 !important;
-    font-size: 18px !important;
-    text-shadow: 0px 0px 3px rgba(0,0,0,0.4);
-    border: 1.5px solid #5c1a1a;
-    box-shadow: 1px 2px 5px rgba(0,0,0,0.4);
-    margin-bottom: 10px;
-    text-align: center;
-    transition: all 0.25s ease-in-out;
-}
-.btn-red:hover {
-    background-color: #6A0000;
-    color: #FFD700 !important;
-    transform: scale(1.05);
 }
 
 /* Botón principal (Clasificar ave) */
@@ -119,13 +108,13 @@ section[data-testid="stFileUploader"] button:hover {
 
 /* Texto del uploader */
 section[data-testid="stFileUploader"] * {
-    color: #ffffff !important;
+    color: #111111 !important;
     font-weight: 600;
 }
 
 /* Caja resultado */
 .result-box {
-    background-color: rgba(0, 0, 0, 0.35);
+    background-color: rgba(139, 43, 43, 0.85);
     border: 2px solid #FFD700;
     border-radius: 15px;
     padding: 1rem 1.2rem;
@@ -307,57 +296,33 @@ except Exception as e:
 # ==========================
 # INTERFAZ PRINCIPAL
 # ==========================
-st.title("🦜 Clasificador de Aves")
-st.markdown(
-    "Sube una imagen de un ave y deja que el modelo de Deep Learning prediga la especie."
-)
+st.markdown("<div class='title-button'>🦜 Clasificador de Aves</div>", unsafe_allow_html=True)
+st.markdown("Sube una imagen de un ave y deja que el modelo de Deep Learning prediga la especie.")
 
-st.subheader("📸 Sube tu imagen")
+st.markdown("<div class='subtitle-button'>📸 Sube tu imagen</div>", unsafe_allow_html=True)
 uploaded_file = st.file_uploader(
     "Sube una imagen de un ave (JPG o PNG)",
     type=["jpg", "jpeg", "png"],
 )
 
-st.markdown(
-    "Una vez cargues la imagen, pulsa *Clasificar ave* para ver las 3 especies más probables."
-)
+st.markdown("Una vez cargues la imagen, pulsa *Clasificar ave* para ver las 3 especies más probables.")
 
 if uploaded_file is not None:
-    # 1️⃣ Intentar abrir la imagen
     try:
-        image = Image.open(uploaded_file)
-        image = image.convert("RGB")
-    except Exception as e:
-        st.error(
-            f"No se pudo abrir la imagen. Asegúrate de que sea un archivo JPG o PNG válido.\n\nDetalle técnico: {e}"
-        )
-        st.stop()
-
-    # 2️⃣ Convertir a numpy para evitar problemas con PIL en st.image
-    try:
+        image = Image.open(uploaded_file).convert("RGB")
         img_display = np.array(image)
     except Exception as e:
-        st.error(f"No se pudo convertir la imagen a arreglo NumPy. Detalle: {e}")
-        st.write("Tipo de objeto image:", type(image))
+        st.error(f"No se pudo abrir la imagen: {e}")
         st.stop()
 
     col1, col2 = st.columns([0.5, 0.5])
 
     with col1:
-        st.markdown(
-            '<div class="btn-red">📸 Imagen subida</div>', unsafe_allow_html=True
-        )
-        try:
-            st.image(img_display, use_column_width=True)
-        except Exception as e:
-            st.error(f"No se pudo mostrar la imagen en la app. Detalle: {e}")
-            st.write("Shape del arreglo:", img_display.shape)
-            st.stop()
+        st.markdown("<div class='subtitle-button'>📸 Imagen subida</div>", unsafe_allow_html=True)
+        st.image(img_display, use_column_width=True)
 
     with col2:
-        st.markdown(
-            '<div class="btn-red">🔍 Predicción</div>', unsafe_allow_html=True
-        )
+        st.markdown("<div class='subtitle-button'>🔍 Predicción</div>", unsafe_allow_html=True)
 
         if st.button("🔍 Clasificar ave", key="predict_button"):
             with st.spinner("Analizando imagen..."):
@@ -369,20 +334,19 @@ if uploaded_file is not None:
             prob = top_pred["prob"] * 100
 
             common_name, habitat = species_info.get(
-                sci_name,
-                ("Nombre común no disponible", "Hábitat no disponible."),
+                sci_name, ("Nombre común no disponible", "Hábitat no disponible.")
             )
 
             st.markdown(
                 f"""
-            <div class='result-box'>
-                <h3>🏆 Especie más probable</h3>
-                <h2>{common_name}</h2>
-                <p><b>Nombre científico:</b> <i>{sci_name}</i></p>
-                <p><b>Confianza:</b> {prob:.2f}%</p>
-                <p><b>Hábitat:</b> {habitat}</p>
-            </div>
-            """,
+                <div class='result-box'>
+                    <h3>🏆 Especie más probable</h3>
+                    <h2>{common_name}</h2>
+                    <p><b>Nombre científico:</b> <i>{sci_name}</i></p>
+                    <p><b>Confianza:</b> {prob:.2f}%</p>
+                    <p><b>Hábitat:</b> {habitat}</p>
+                </div>
+                """,
                 unsafe_allow_html=True,
             )
 
@@ -400,4 +364,5 @@ if uploaded_file is not None:
             st.bar_chart(df_pred.set_index("Especie (modelo)"))
 else:
     st.info("👆 Sube una imagen para comenzar la clasificación.")
+
 
