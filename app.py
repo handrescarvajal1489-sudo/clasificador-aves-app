@@ -76,16 +76,20 @@ div.stButton > button:first-child {
     color: #6D090D !important;
     font-weight: 800 !important;
     font-size: 18px !important;
-    border: 1.5px solid #5c1a1a !important;
-    border-radius: 10px !important;
-    padding: 10px 20px !important;
-    text-shadow: 0px 0px 3px rgba(0,0,0,0.4);
-    box-shadow: 1px 2px 5px rgba(0,0,0,0.4) !important;
+    font-family: 'Segoe UI', sans-serif !important;
+    border: 2px solid #5c1a1a !important;
+    border-radius: 12px !important;
+    padding: 10px 25px !important;
+    text-shadow: 0px 0px 3px rgba(0, 0, 0, 0.4);
+    box-shadow: 1px 2px 5px rgba(0, 0, 0, 0.4) !important;
+    margin: 10px 0 !important;
     transition: all 0.25s ease-in-out !important;
 }
+
+/* Efecto hover (al pasar el cursor) */
 div.stButton > button:first-child:hover {
-    background-color: #6A0000 !important;
-    color: #FFD700 !important;
+    background-color: #6D090D !important;
+    color: #FCDD09 !important;
     transform: scale(1.05);
 }
 
@@ -309,6 +313,7 @@ if uploaded_file:
             st.dataframe(df_pred, use_container_width=True)
 else:
     st.info("👆 Sube una imagen para comenzar la detección.")
+
 
 
 
