@@ -348,7 +348,7 @@ if uploaded_file is not None:
             '<div class="btn-red">📸 Imagen subida</div>', unsafe_allow_html=True
         )
         try:
-            st.image(img_display, use_container_width=True)
+            st.image(img_display, use_column_width=True)
         except Exception as e:
             st.error(f"No se pudo mostrar la imagen en la app. Detalle: {e}")
             st.write("Shape del arreglo:", img_display.shape)
@@ -400,6 +400,7 @@ if uploaded_file is not None:
             st.bar_chart(df_pred.set_index("Especie (modelo)"))
 else:
     st.info("👆 Sube una imagen para comenzar la clasificación.")
+
 
 
 
