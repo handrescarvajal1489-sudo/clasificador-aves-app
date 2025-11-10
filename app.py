@@ -206,7 +206,7 @@ def normalizar(texto: str) -> str:
 # ==========================
 species_table = {
     "Especie científica": [
-        "Amazilia cyaninfrons",
+        "Amazilia cyanifrons",  
         "Anthocephala berlepschi",
         "Atlapetes flaviceps",
         "Bolborhynchus ferrugineifrons",
@@ -401,6 +401,7 @@ if uploaded_file:
             st.bar_chart(df_pred.set_index("Especie (modelo)"))
 else:
     st.info("👆 Sube una imagen para comenzar la detección.")
+
 
 
 
